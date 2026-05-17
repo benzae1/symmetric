@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software &amp; DevOps Metrics Database — Bauhaus-Universität Weimar</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <div class="hero__text">
+        <h1>Software &amp; DevOps Metrics Database</h1>
+        <p class="hero__copy">
+          A searchable reference for software engineering, DevOps, SRE, security,
+          testing, delivery, and metric-quality measures.
+        </p>
+      </div>
+      <svg class="hero__mark" viewBox="0 0 480 160" role="img" aria-label="Bauhaus geometric primitives">
+        <rect x="20" y="20" width="120" height="120" fill="#D22630"></rect>
+        <circle cx="240" cy="80" r="60" fill="#FFD100"></circle>
+        <polygon points="360,140 420,20 480,140" fill="#00677F"></polygon>
+      </svg>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Search and filters">
+      <div class="controls__top">
+        <label class="field field--search" for="searchInput">
+          <span>Search metrics</span>
+          <input
+            id="searchInput"
+            name="search"
+            type="search"
+            placeholder="Search by name, category, measurement, tags, difficulty…"
+            autocomplete="off"
+          >
+        </label>
+        <button id="resetButton" class="reset-button" type="button">Reset filters</button>
+      </div>
+
+      <div class="filters">
+        <label class="field" for="typeFilter">
+          <span>Metric type</span>
+          <select id="typeFilter" name="type">
+            <option value="all">All metrics</option>
+            <option value="software_metric">Software metrics</option>
+            <option value="meta_metric">Meta-metrics</option>
+          </select>
+        </label>
+
+        <label class="field" for="categoryFilter">
+          <span>Category</span>
+          <select id="categoryFilter" name="category">
+            <option value="">Add a category filter</option>
+          </select>
+        </label>
+
+        <label class="field" for="difficultyFilter">
+          <span>Difficulty</span>
+          <select id="difficultyFilter" name="difficulty">
+            <option value="all">All difficulties</option>
+          </select>
+        </label>
+
+        <label class="field" for="sortFilter">
+          <span>Sort by</span>
+          <select id="sortFilter" name="sort">
+            <option value="source">Source order</option>
+            <option value="name">Name A–Z</option>
+            <option value="category">Category A–Z</option>
+            <option value="difficulty">Difficulty</option>
+          </select>
+        </label>
+
+        <div class="field field--leading" id="leadingField">
+          <span>Leading / lagging</span>
+          <select id="leadingFilter" name="leadingLagging">
+            <option value="all">All</option>
+          </select>
+          <p id="leadingHint" class="field__hint" hidden>
+            Meta-metrics do not use a leading or lagging classification.
+          </p>
+        </div>
+      </div>
+
+      <div id="activeCategoryFilters" class="active-filters" hidden aria-live="polite">
+        <span class="active-filters__label">Active categories</span>
+        <div id="categoryChips" class="chips"></div>
+      </div>
+    </section>
+
+    <section class="results page" aria-live="polite">
+      <div class="results__bar">
+        <p id="resultsCount" class="results__count">Loading metrics…</p>
+        <p id="resultsSummary" class="results__summary"></p>
+      </div>
+      <div id="cardsContainer" class="cards"></div>
+      <div id="emptyState" class="empty-state" hidden>
+        <span class="empty-state__mark" aria-hidden="true"></span>
+        <div>
+          <h2>No metrics match the current filters.</h2>
+          <p>Try broadening your search, clearing a filter, or pressing »Reset filters« to start over.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span><strong>Software &amp; DevOps Metrics Database</strong> — Static Reference</span>
+      <span>Visual identity after the Bauhaus-Universität Weimar Corporate Design</span>
+    </div>
+  </footer>
+
+  <template id="metricCardTemplate">
+    <article class="metric-card">
+      <div class="metric-card__index"></div>
+      <div class="metric-card__body">
+        <p class="metric-card__meta"></p>
+        <h2 class="metric-card__title"></h2>
+        <p class="metric-card__description"></p>
+
+        <dl class="metric-card__details">
+          <div>
+            <dt>How it is measured</dt>
+            <dd class="metric-card__measurement"></dd>
+          </div>
+          <div class="metric-card__leading-row">
+            <dt>Leading / lagging</dt>
+            <dd class="metric-card__leading"></dd>
+          </div>
+          <div>
+            <dt>Difficulty justification</dt>
+            <dd class="metric-card__justification"></dd>
+          </div>
+        </dl>
+
+        <ul class="metric-card__tags" aria-label="Tags"></ul>
+      </div>
+      <span class="metric-card__difficulty"></span>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
