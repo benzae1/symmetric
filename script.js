@@ -14,8 +14,10 @@ const state = {
     search: "",
     language: "all",
     category: "all",
-    metric: "all"
-  }
+    metric: "all",
+    relatedMetricId: "all"
+  },
+  expandedMetricIds: new Set()
 };
 
 const difficultyOrder = {
@@ -357,7 +359,8 @@ function resetToolFilters() {
     search: "",
     language: "all",
     category: "all",
-    metric: "all"
+    metric: "all",
+    relatedMetricId: "all"
   };
 
   elements.toolSearchInput.value = "";
@@ -450,6 +453,13 @@ function buildSummary() {
 function buildToolSummary() {
   const parts = ["Browse by <span>language</span>, <span>category</span>, and <span>measured metric</span>"];
 
+  if (state.toolFilters.relatedMetricId !== "all") {
+    const relatedMetric = state.metrics.find((metric) => String(metric.id) === state.toolFilters.relatedMetricId);
+    if (relatedMetric) {
+      parts.push(`Related to <span>${escapeHtml(relatedMetric.name)}</span>`);
+    }
+  }
+
   if (state.toolFilters.language !== "all") {
     parts.push(`<span>${escapeHtml(state.toolFilters.language)}</span>`);
   }
@@ -491,8 +501,11 @@ function applyToolFilters(tools) {
     const matchesCategory = state.toolFilters.category === "all" || tool.category === state.toolFilters.category;
     const matchesMetric =
       state.toolFilters.metric === "all" || (tool.metrics || []).includes(state.toolFilters.metric);
+    const matchesRelatedMetric =
+      state.toolFilters.relatedMetricId === "all" ||
+      (tool.relatedMetricIds || []).includes(state.toolFilters.relatedMetricId);
 
-    return matchesSearch && matchesLanguage && matchesCategory && matchesMetric;
+    return matchesSearch && matchesLanguage && matchesCategory && matchesMetric && matchesRelatedMetric;
   });
 }
 
@@ -546,6 +559,8 @@ function applySort(metrics) {
 function createMetricCard(metric) {
   const card = elements.cardTemplate.content.firstElementChild.cloneNode(true);
   const indexLabel = String(metric.id).padStart(2, "0");
+  const relatedTools = getRelatedTools(metric.id);
+  const isExpanded = state.expandedMetricIds.has(String(metric.id));
 
   card.querySelector(".metric-card__index").textContent = indexLabel;
 
@@ -582,7 +597,78 @@ function createMetricCard(metric) {
     tagsList.append(item);
   }
 
+  const toolsToggle = card.querySelector(".metric-card__tools-toggle");
+  const toolsPanel = card.querySelector(".metric-card__tools-panel");
+  const toolsList = card.querySelector(".metric-card__tools-list");
+  const toolsLink = card.querySelector(".metric-card__tools-link");
+
+  toolsToggle.textContent = relatedTools.length > 0
+    ? `Show related tools (${relatedTools.length})`
+    : "Show related tools";
+  toolsToggle.setAttribute("aria-expanded", String(isExpanded));
+  toolsPanel.hidden = !isExpanded;
+
+  if (relatedTools.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "metric-card__tools-empty";
+    emptyMessage.textContent = "No tools are mapped to this metric yet in the current static dataset.";
+    toolsList.append(emptyMessage);
+    toolsLink.hidden = true;
+  } else {
+    for (const tool of relatedTools) {
+      toolsList.append(createRelatedToolChip(tool));
+    }
+
+    toolsLink.addEventListener("click", () => {
+      openToolFinderForMetric(metric.id);
+    });
+  }
+
+  toolsToggle.addEventListener("click", () => {
+    toggleMetricTools(metric.id);
+  });
+
   return card;
+}
+
+function getRelatedTools(metricId) {
+  return state.tools.filter((tool) => (tool.relatedMetricIds || []).includes(String(metricId)));
+}
+
+function createRelatedToolChip(tool) {
+  const article = document.createElement("article");
+  article.className = "related-tool";
+
+  const name = document.createElement("p");
+  name.className = "related-tool__name";
+  name.textContent = tool.name;
+
+  const meta = document.createElement("p");
+  meta.className = "related-tool__meta";
+  meta.textContent = `${tool.language} | ${tool.category}`;
+
+  article.append(name, meta);
+  return article;
+}
+
+function toggleMetricTools(metricId) {
+  const normalizedId = String(metricId);
+
+  if (state.expandedMetricIds.has(normalizedId)) {
+    state.expandedMetricIds.delete(normalizedId);
+  } else {
+    state.expandedMetricIds.add(normalizedId);
+  }
+
+  render();
+}
+
+function openToolFinderForMetric(metricId) {
+  state.toolFilters.search = "";
+  state.toolFilters.relatedMetricId = String(metricId);
+  elements.toolSearchInput.value = "";
+  setActiveTab("tools");
+  renderTools();
 }
 
 function createToolCard(tool) {
