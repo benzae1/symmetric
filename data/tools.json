@@ -1,0 +1,245 @@
+[
+  {
+    "id": "tool-1",
+    "name": "pylint",
+    "language": "Python",
+    "category": "Style & errors",
+    "metrics": [
+      "PEP 8 violations",
+      "code smells",
+      "undefined variables",
+      "unused imports",
+      "refactoring suggestions",
+      "global score (0-10)"
+    ]
+  },
+  {
+    "id": "tool-2",
+    "name": "flake8",
+    "language": "Python",
+    "category": "Style & errors",
+    "metrics": [
+      "PEP 8 style violations",
+      "syntax errors",
+      "undefined names",
+      "import ordering",
+      "line length"
+    ]
+  },
+  {
+    "id": "tool-3",
+    "name": "ruff",
+    "language": "Python",
+    "category": "Style & errors",
+    "metrics": [
+      "PEP 8 violations",
+      "unused imports",
+      "shadowed variables",
+      "syntax errors",
+      "security anti-patterns",
+      "rule violations (500+ rules)"
+    ]
+  },
+  {
+    "id": "tool-4",
+    "name": "radon",
+    "language": "Python",
+    "category": "Complexity",
+    "metrics": [
+      "cyclomatic complexity (CC)",
+      "maintainability index (MI)",
+      "Halstead metrics",
+      "lines of code (raw)"
+    ]
+  },
+  {
+    "id": "tool-5",
+    "name": "wily",
+    "language": "Python",
+    "category": "Complexity",
+    "metrics": [
+      "cyclomatic complexity over time",
+      "maintainability index trends",
+      "Halstead metrics over git history",
+      "lines of code delta"
+    ]
+  },
+  {
+    "id": "tool-6",
+    "name": "mccabe",
+    "language": "Python",
+    "category": "Complexity",
+    "metrics": [
+      "cyclomatic complexity per function",
+      "complexity threshold violations"
+    ]
+  },
+  {
+    "id": "tool-7",
+    "name": "pytest",
+    "language": "Python",
+    "category": "Testing",
+    "metrics": [
+      "pass/fail counts",
+      "test duration",
+      "error messages",
+      "fixture usage",
+      "parametrized case results"
+    ]
+  },
+  {
+    "id": "tool-8",
+    "name": "coverage.py",
+    "language": "Python",
+    "category": "Testing",
+    "metrics": [
+      "line coverage %",
+      "branch coverage %",
+      "uncovered lines",
+      "partial branches"
+    ]
+  },
+  {
+    "id": "tool-9",
+    "name": "mutmut",
+    "language": "Python",
+    "category": "Testing",
+    "metrics": [
+      "mutation score",
+      "survived mutants",
+      "killed mutants",
+      "test suite effectiveness"
+    ]
+  },
+  {
+    "id": "tool-10",
+    "name": "hypothesis",
+    "language": "Python",
+    "category": "Testing",
+    "metrics": [
+      "property violations found",
+      "edge cases discovered",
+      "shrunk counterexamples"
+    ]
+  },
+  {
+    "id": "tool-11",
+    "name": "bandit",
+    "language": "Python",
+    "category": "Security",
+    "metrics": [
+      "severity-rated security issues (low/med/high)",
+      "confidence rating",
+      "vulnerability categories (e.g. SQLi, hardcoded passwords)"
+    ]
+  },
+  {
+    "id": "tool-12",
+    "name": "safety",
+    "language": "Python",
+    "category": "Security",
+    "metrics": [
+      "known CVEs in dependencies",
+      "vulnerable package versions",
+      "severity scores"
+    ]
+  },
+  {
+    "id": "tool-13",
+    "name": "pip-audit",
+    "language": "Python",
+    "category": "Security",
+    "metrics": [
+      "CVE count per dependency",
+      "GHSA advisories",
+      "affected version ranges",
+      "fix availability"
+    ]
+  },
+  {
+    "id": "tool-14",
+    "name": "mypy",
+    "language": "Python",
+    "category": "Type checking",
+    "metrics": [
+      "type errors",
+      "missing annotations",
+      "incompatible return types",
+      "optional misuse",
+      "unresolved imports"
+    ]
+  },
+  {
+    "id": "tool-15",
+    "name": "pyright",
+    "language": "Python",
+    "category": "Type checking",
+    "metrics": [
+      "type errors",
+      "unknown types",
+      "narrowing violations",
+      "import resolution issues",
+      "strict mode violations"
+    ]
+  },
+  {
+    "id": "tool-16",
+    "name": "scalene",
+    "language": "Python",
+    "category": "Performance",
+    "metrics": [
+      "CPU time per line",
+      "memory allocation per line",
+      "GPU utilization",
+      "Python vs native time split"
+    ]
+  },
+  {
+    "id": "tool-17",
+    "name": "py-spy",
+    "language": "Python",
+    "category": "Performance",
+    "metrics": [
+      "sampling-based CPU profiles",
+      "call stack frequency",
+      "thread activity",
+      "flame graph data"
+    ]
+  },
+  {
+    "id": "tool-18",
+    "name": "memray",
+    "language": "Python",
+    "category": "Performance",
+    "metrics": [
+      "heap memory allocations",
+      "peak memory usage",
+      "allocation call stacks",
+      "memory leaks"
+    ]
+  },
+  {
+    "id": "tool-19",
+    "name": "vulture",
+    "language": "Python",
+    "category": "Dead code",
+    "metrics": [
+      "unused functions",
+      "unused variables",
+      "unused imports",
+      "unreachable code",
+      "confidence %"
+    ]
+  },
+  {
+    "id": "tool-20",
+    "name": "pylint-similar / clonedigger",
+    "language": "Python",
+    "category": "Duplication",
+    "metrics": [
+      "duplicate code blocks",
+      "similar lines count",
+      "clone pairs"
+    ]
+  }
+]

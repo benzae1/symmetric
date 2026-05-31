@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Software &amp; DevOps Metrics Database — Bauhaus-Universität Weimar</title>
+  <title>Software &amp; DevOps Metrics Database - Bauhaus-Universitat Weimar</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,92 +25,177 @@
   </header>
 
   <main>
-    <section class="controls" aria-label="Search and filters">
-      <div class="controls__top">
-        <label class="field field--search" for="searchInput">
-          <span>Search metrics</span>
-          <input
-            id="searchInput"
-            name="search"
-            type="search"
-            placeholder="Search by name, category, measurement, tags, difficulty…"
-            autocomplete="off"
-          >
-        </label>
-        <button id="resetButton" class="reset-button" type="button">Reset filters</button>
-      </div>
-
-      <div class="filters">
-        <label class="field" for="typeFilter">
-          <span>Metric type</span>
-          <select id="typeFilter" name="type">
-            <option value="all">All metrics</option>
-            <option value="software_metric">Software metrics</option>
-            <option value="meta_metric">Meta-metrics</option>
-          </select>
-        </label>
-
-        <label class="field" for="categoryFilter">
-          <span>Category</span>
-          <select id="categoryFilter" name="category">
-            <option value="">Add a category filter</option>
-          </select>
-        </label>
-
-        <label class="field" for="difficultyFilter">
-          <span>Difficulty</span>
-          <select id="difficultyFilter" name="difficulty">
-            <option value="all">All difficulties</option>
-          </select>
-        </label>
-
-        <label class="field" for="sortFilter">
-          <span>Sort by</span>
-          <select id="sortFilter" name="sort">
-            <option value="source">Source order</option>
-            <option value="name">Name A–Z</option>
-            <option value="category">Category A–Z</option>
-            <option value="difficulty">Difficulty</option>
-          </select>
-        </label>
-
-        <div class="field field--leading" id="leadingField">
-          <span>Leading / lagging</span>
-          <select id="leadingFilter" name="leadingLagging">
-            <option value="all">All</option>
-          </select>
-          <p id="leadingHint" class="field__hint" hidden>
-            Meta-metrics do not use a leading or lagging classification.
-          </p>
-        </div>
-      </div>
-
-      <div id="activeCategoryFilters" class="active-filters" hidden aria-live="polite">
-        <span class="active-filters__label">Active categories</span>
-        <div id="categoryChips" class="chips"></div>
+    <section class="tabs page" aria-label="Reference sections">
+      <div class="tabs__list" role="tablist" aria-label="Database views">
+        <button
+          id="tabButtonMetrics"
+          class="tab-button is-active"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="metricsPanel"
+          data-tab="metrics"
+        >
+          Metrics database
+        </button>
+        <button
+          id="tabButtonTools"
+          class="tab-button"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="toolsPanel"
+          data-tab="tools"
+        >
+          Tool finder
+        </button>
       </div>
     </section>
 
-    <section class="results page" aria-live="polite">
-      <div class="results__bar">
-        <p id="resultsCount" class="results__count">Loading metrics…</p>
-        <p id="resultsSummary" class="results__summary"></p>
-      </div>
-      <div id="cardsContainer" class="cards"></div>
-      <div id="emptyState" class="empty-state" hidden>
-        <span class="empty-state__mark" aria-hidden="true"></span>
-        <div>
-          <h2>No metrics match the current filters.</h2>
-          <p>Try broadening your search, clearing a filter, or pressing »Reset filters« to start over.</p>
+    <section id="metricsPanel" class="tab-panel" role="tabpanel" aria-labelledby="tabButtonMetrics">
+      <section class="controls" aria-label="Metric search and filters">
+        <div class="controls__top">
+          <label class="field field--search" for="searchInput">
+            <span>Search metrics</span>
+            <input
+              id="searchInput"
+              name="search"
+              type="search"
+              placeholder="Search by name, category, measurement, tags, difficulty..."
+              autocomplete="off"
+            >
+          </label>
+          <button id="resetButton" class="reset-button" type="button">Reset filters</button>
         </div>
-      </div>
+
+        <div class="filters">
+          <label class="field" for="typeFilter">
+            <span>Metric type</span>
+            <select id="typeFilter" name="type">
+              <option value="all">All metrics</option>
+              <option value="software_metric">Software metrics</option>
+              <option value="meta_metric">Meta-metrics</option>
+            </select>
+          </label>
+
+          <label class="field" for="categoryFilter">
+            <span>Category</span>
+            <select id="categoryFilter" name="category">
+              <option value="">Add a category filter</option>
+            </select>
+          </label>
+
+          <label class="field" for="difficultyFilter">
+            <span>Difficulty</span>
+            <select id="difficultyFilter" name="difficulty">
+              <option value="all">All difficulties</option>
+            </select>
+          </label>
+
+          <label class="field" for="sortFilter">
+            <span>Sort by</span>
+            <select id="sortFilter" name="sort">
+              <option value="source">Source order</option>
+              <option value="name">Name A-Z</option>
+              <option value="category">Category A-Z</option>
+              <option value="difficulty">Difficulty</option>
+            </select>
+          </label>
+
+          <div class="field field--leading" id="leadingField">
+            <span>Leading / lagging</span>
+            <select id="leadingFilter" name="leadingLagging">
+              <option value="all">All</option>
+            </select>
+            <p id="leadingHint" class="field__hint" hidden>
+              Meta-metrics do not use a leading or lagging classification.
+            </p>
+          </div>
+        </div>
+
+        <div id="activeCategoryFilters" class="active-filters" hidden aria-live="polite">
+          <span class="active-filters__label">Active categories</span>
+          <div id="categoryChips" class="chips"></div>
+        </div>
+      </section>
+
+      <section class="results page" aria-live="polite">
+        <div class="results__bar">
+          <p id="resultsCount" class="results__count">Loading metrics...</p>
+          <p id="resultsSummary" class="results__summary"></p>
+        </div>
+        <div id="cardsContainer" class="cards"></div>
+        <div id="emptyState" class="empty-state" hidden>
+          <span class="empty-state__mark" aria-hidden="true"></span>
+          <div>
+            <h2>No metrics match the current filters.</h2>
+            <p>Try broadening your search, clearing a filter, or pressing "Reset filters" to start over.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="toolsPanel" class="tab-panel" role="tabpanel" aria-labelledby="tabButtonTools" hidden>
+      <section class="controls" aria-label="Tool search and filters">
+        <div class="controls__top">
+          <label class="field field--search" for="toolSearchInput">
+            <span>Search tools or metrics</span>
+            <input
+              id="toolSearchInput"
+              name="toolSearch"
+              type="search"
+              placeholder="Search by tool name, language, category, or measured metric..."
+              autocomplete="off"
+            >
+          </label>
+          <button id="toolResetButton" class="reset-button" type="button">Reset filters</button>
+        </div>
+
+        <div class="filters filters--tools">
+          <label class="field" for="toolLanguageFilter">
+            <span>Programming language</span>
+            <select id="toolLanguageFilter" name="toolLanguage">
+              <option value="all">All languages</option>
+            </select>
+          </label>
+
+          <label class="field" for="toolCategoryFilter">
+            <span>Category</span>
+            <select id="toolCategoryFilter" name="toolCategory">
+              <option value="all">All categories</option>
+            </select>
+          </label>
+
+          <label class="field" for="toolMetricFilter">
+            <span>Measured metric</span>
+            <select id="toolMetricFilter" name="toolMetric">
+              <option value="all">All metrics</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="results page" aria-live="polite">
+        <div class="results__bar">
+          <p id="toolResultsCount" class="results__count">Loading tools...</p>
+          <p id="toolResultsSummary" class="results__summary"></p>
+        </div>
+        <div id="toolCardsContainer" class="tool-grid"></div>
+        <div id="toolEmptyState" class="empty-state" hidden>
+          <span class="empty-state__mark" aria-hidden="true"></span>
+          <div>
+            <h2>No tools match the current filters.</h2>
+            <p>Try broadening the language, category, or measured-metric filters to explore more tools.</p>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="site-footer__inner">
-      <span><strong>Software &amp; DevOps Metrics Database</strong> — Static Reference</span>
-      <span>Visual identity after the Bauhaus-Universität Weimar Corporate Design</span>
+      <span><strong>Software &amp; DevOps Metrics Database</strong> - Static Reference</span>
+      <span>Visual identity after the Bauhaus-Universitat Weimar Corporate Design</span>
     </div>
   </footer>
 
@@ -140,6 +225,20 @@
         <ul class="metric-card__tags" aria-label="Tags"></ul>
       </div>
       <span class="metric-card__difficulty"></span>
+    </article>
+  </template>
+
+  <template id="toolCardTemplate">
+    <article class="tool-card">
+      <div class="tool-card__head">
+        <p class="tool-card__eyebrow"></p>
+        <h2 class="tool-card__title"></h2>
+      </div>
+      <p class="tool-card__category"></p>
+      <div class="tool-card__metrics">
+        <p class="tool-card__label">Measured metrics</p>
+        <ul class="tool-card__list"></ul>
+      </div>
     </article>
   </template>
 

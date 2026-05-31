@@ -1,5 +1,7 @@
 const state = {
+  activeTab: "metrics",
   metrics: [],
+  tools: [],
   filters: {
     search: "",
     type: "all",
@@ -7,6 +9,12 @@ const state = {
     leadingLagging: "all",
     difficulty: "all",
     sort: "source"
+  },
+  toolFilters: {
+    search: "",
+    language: "all",
+    category: "all",
+    metric: "all"
   }
 };
 
@@ -20,6 +28,11 @@ const difficultyOrder = {
 };
 
 const elements = {
+  tabButtons: [...document.querySelectorAll(".tab-button")],
+  tabPanels: {
+    metrics: document.querySelector("#metricsPanel"),
+    tools: document.querySelector("#toolsPanel")
+  },
   searchInput: document.querySelector("#searchInput"),
   typeFilter: document.querySelector("#typeFilter"),
   categoryFilter: document.querySelector("#categoryFilter"),
@@ -35,10 +48,30 @@ const elements = {
   resultsSummary: document.querySelector("#resultsSummary"),
   cardsContainer: document.querySelector("#cardsContainer"),
   emptyState: document.querySelector("#emptyState"),
-  cardTemplate: document.querySelector("#metricCardTemplate")
+  cardTemplate: document.querySelector("#metricCardTemplate"),
+  toolSearchInput: document.querySelector("#toolSearchInput"),
+  toolLanguageFilter: document.querySelector("#toolLanguageFilter"),
+  toolCategoryFilter: document.querySelector("#toolCategoryFilter"),
+  toolMetricFilter: document.querySelector("#toolMetricFilter"),
+  toolResetButton: document.querySelector("#toolResetButton"),
+  toolResultsCount: document.querySelector("#toolResultsCount"),
+  toolResultsSummary: document.querySelector("#toolResultsSummary"),
+  toolCardsContainer: document.querySelector("#toolCardsContainer"),
+  toolEmptyState: document.querySelector("#toolEmptyState"),
+  toolCardTemplate: document.querySelector("#toolCardTemplate")
 };
 
 async function init() {
+  bindEvents();
+
+  await Promise.all([loadMetrics(), loadTools()]);
+
+  setActiveTab(state.activeTab);
+  render();
+  renderTools();
+}
+
+async function loadMetrics() {
   try {
     const response = await fetch("data/metrics.json");
 
@@ -50,12 +83,10 @@ async function init() {
     state.metrics = metrics.map((metric, index) => ({
       ...metric,
       sourceOrder: index,
-      searchText: buildSearchText(metric)
+      searchText: buildMetricSearchText(metric)
     }));
 
     populateStaticFilters();
-    bindEvents();
-    render();
   } catch (error) {
     elements.resultsCount.textContent = "Unable to load metrics data.";
     elements.cardsContainer.innerHTML = "";
@@ -67,23 +98,40 @@ async function init() {
   }
 }
 
-function buildSearchText(metric) {
-  return [
-    metric.name,
-    metric.category,
-    metric.shortDescription,
-    metric.measurement,
-    metric.leadingLagging,
-    metric.difficulty,
-    metric.difficultyJustification,
-    ...(metric.tags || [])
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+async function loadTools() {
+  try {
+    const response = await fetch("data/tools.json");
+
+    if (!response.ok) {
+      throw new Error(`Failed to load tools: ${response.status}`);
+    }
+
+    const tools = await response.json();
+    state.tools = tools.map((tool, index) => ({
+      ...tool,
+      sourceOrder: index,
+      searchText: buildToolSearchText(tool)
+    }));
+
+    populateToolFilters();
+  } catch (error) {
+    elements.toolResultsCount.textContent = "Unable to load tool data.";
+    elements.toolCardsContainer.innerHTML = "";
+    elements.toolEmptyState.hidden = false;
+    elements.toolEmptyState.innerHTML = `
+      <h2>Tool data could not be loaded.</h2>
+      <p>${escapeHtml(error.message)}</p>
+    `;
+  }
 }
 
 function bindEvents() {
+  for (const button of elements.tabButtons) {
+    button.addEventListener("click", () => {
+      setActiveTab(button.dataset.tab);
+    });
+  }
+
   elements.searchInput.addEventListener("input", (event) => {
     state.filters.search = event.target.value.trim().toLowerCase();
     render();
@@ -120,6 +168,71 @@ function bindEvents() {
   });
 
   elements.resetButton.addEventListener("click", resetFilters);
+
+  elements.toolSearchInput.addEventListener("input", (event) => {
+    state.toolFilters.search = event.target.value.trim().toLowerCase();
+    renderTools();
+  });
+
+  elements.toolLanguageFilter.addEventListener("change", (event) => {
+    state.toolFilters.language = event.target.value;
+    renderTools();
+  });
+
+  elements.toolCategoryFilter.addEventListener("change", (event) => {
+    state.toolFilters.category = event.target.value;
+    renderTools();
+  });
+
+  elements.toolMetricFilter.addEventListener("change", (event) => {
+    state.toolFilters.metric = event.target.value;
+    renderTools();
+  });
+
+  elements.toolResetButton.addEventListener("click", resetToolFilters);
+}
+
+function setActiveTab(tab) {
+  state.activeTab = tab;
+
+  for (const button of elements.tabButtons) {
+    const isActive = button.dataset.tab === tab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+    button.tabIndex = isActive ? 0 : -1;
+  }
+
+  for (const [panelName, panel] of Object.entries(elements.tabPanels)) {
+    panel.hidden = panelName !== tab;
+  }
+}
+
+function buildMetricSearchText(metric) {
+  return [
+    metric.name,
+    metric.category,
+    metric.shortDescription,
+    metric.measurement,
+    metric.leadingLagging,
+    metric.difficulty,
+    metric.difficultyJustification,
+    ...(metric.tags || [])
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function buildToolSearchText(tool) {
+  return [
+    tool.name,
+    tool.language,
+    tool.category,
+    ...(tool.metrics || [])
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 }
 
 function populateStaticFilters() {
@@ -139,6 +252,26 @@ function populateStaticFilters() {
   );
 
   updateLeadingFilterState();
+}
+
+function populateToolFilters() {
+  populateOptions(
+    elements.toolLanguageFilter,
+    "All languages",
+    getUniqueValues(state.tools.map((tool) => tool.language))
+  );
+
+  populateOptions(
+    elements.toolCategoryFilter,
+    "All categories",
+    getUniqueValues(state.tools.map((tool) => tool.category))
+  );
+
+  populateOptions(
+    elements.toolMetricFilter,
+    "All metrics",
+    getUniqueValues(state.tools.flatMap((tool) => tool.metrics || []))
+  );
 }
 
 function updateLeadingFilterState() {
@@ -219,14 +352,29 @@ function resetFilters() {
   render();
 }
 
+function resetToolFilters() {
+  state.toolFilters = {
+    search: "",
+    language: "all",
+    category: "all",
+    metric: "all"
+  };
+
+  elements.toolSearchInput.value = "";
+  elements.toolLanguageFilter.value = "all";
+  elements.toolCategoryFilter.value = "all";
+  elements.toolMetricFilter.value = "all";
+
+  renderTools();
+}
+
 function render() {
   const filteredMetrics = applyFilters(state.metrics);
   const sortedMetrics = applySort(filteredMetrics);
 
   const count = sortedMetrics.length;
   const total = state.metrics.length;
-  elements.resultsCount.innerHTML =
-    `<strong>${count}</strong> of ${total} metric${total === 1 ? "" : "s"} shown`;
+  elements.resultsCount.innerHTML = `<strong>${count}</strong> of ${total} metric${total === 1 ? "" : "s"} shown`;
   elements.resultsSummary.innerHTML = buildSummary();
   renderCategoryChips();
 
@@ -246,12 +394,36 @@ function render() {
   elements.cardsContainer.append(fragment);
 }
 
+function renderTools() {
+  const filteredTools = applyToolFilters(state.tools);
+
+  const count = filteredTools.length;
+  const total = state.tools.length;
+  elements.toolResultsCount.innerHTML = `<strong>${count}</strong> of ${total} tool${total === 1 ? "" : "s"} shown`;
+  elements.toolResultsSummary.innerHTML = buildToolSummary();
+
+  elements.toolCardsContainer.innerHTML = "";
+  elements.toolEmptyState.hidden = count > 0;
+
+  if (count === 0) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  for (const tool of filteredTools) {
+    fragment.append(createToolCard(tool));
+  }
+
+  elements.toolCardsContainer.append(fragment);
+}
+
 function buildSummary() {
   const parts = [];
   const sortLabels = {
     source: "Source order",
-    name: "Name A\u2013Z",
-    category: "Category A\u2013Z",
+    name: "Name A-Z",
+    category: "Category A-Z",
     difficulty: "Difficulty"
   };
   parts.push(`Sorted by <span>${sortLabels[state.filters.sort] || state.filters.sort}</span>`);
@@ -269,10 +441,29 @@ function buildSummary() {
     parts.push(`<span>${escapeHtml(state.filters.leadingLagging)}</span>`);
   }
   if (state.filters.search) {
-    parts.push(`Search \u00BB<span>${escapeHtml(state.filters.search)}</span>\u00AB`);
+    parts.push(`Search "<span>${escapeHtml(state.filters.search)}</span>"`);
   }
 
-  return parts.join(" \u00B7 ");
+  return parts.join(" | ");
+}
+
+function buildToolSummary() {
+  const parts = ["Browse by <span>language</span>, <span>category</span>, and <span>measured metric</span>"];
+
+  if (state.toolFilters.language !== "all") {
+    parts.push(`<span>${escapeHtml(state.toolFilters.language)}</span>`);
+  }
+  if (state.toolFilters.category !== "all") {
+    parts.push(`<span>${escapeHtml(state.toolFilters.category)}</span>`);
+  }
+  if (state.toolFilters.metric !== "all") {
+    parts.push(`Metric <span>${escapeHtml(state.toolFilters.metric)}</span>`);
+  }
+  if (state.toolFilters.search) {
+    parts.push(`Search "<span>${escapeHtml(state.toolFilters.search)}</span>"`);
+  }
+
+  return parts.join(" | ");
 }
 
 function applyFilters(metrics) {
@@ -293,6 +484,18 @@ function applyFilters(metrics) {
   });
 }
 
+function applyToolFilters(tools) {
+  return tools.filter((tool) => {
+    const matchesSearch = !state.toolFilters.search || tool.searchText.includes(state.toolFilters.search);
+    const matchesLanguage = state.toolFilters.language === "all" || tool.language === state.toolFilters.language;
+    const matchesCategory = state.toolFilters.category === "all" || tool.category === state.toolFilters.category;
+    const matchesMetric =
+      state.toolFilters.metric === "all" || (tool.metrics || []).includes(state.toolFilters.metric);
+
+    return matchesSearch && matchesLanguage && matchesCategory && matchesMetric;
+  });
+}
+
 function renderCategoryChips() {
   elements.categoryChips.innerHTML = "";
   const hasCategories = state.filters.categories.length > 0;
@@ -307,7 +510,7 @@ function renderCategoryChips() {
     chip.type = "button";
     chip.className = "chip";
     chip.setAttribute("aria-label", `Remove category filter ${category}`);
-    chip.innerHTML = `<span>${escapeHtml(category)}</span><span class="chip__remove" aria-hidden="true">×</span>`;
+    chip.innerHTML = `<span>${escapeHtml(category)}</span><span class="chip__remove" aria-hidden="true">x</span>`;
     chip.addEventListener("click", () => {
       state.filters.categories = state.filters.categories.filter((value) => value !== category);
       render();
@@ -382,12 +585,29 @@ function createMetricCard(metric) {
   return card;
 }
 
+function createToolCard(tool) {
+  const card = elements.toolCardTemplate.content.firstElementChild.cloneNode(true);
+
+  card.querySelector(".tool-card__eyebrow").textContent = tool.language;
+  card.querySelector(".tool-card__title").textContent = tool.name;
+  card.querySelector(".tool-card__category").textContent = tool.category;
+
+  const list = card.querySelector(".tool-card__list");
+  for (const metric of tool.metrics || []) {
+    const item = document.createElement("li");
+    item.textContent = metric;
+    list.append(item);
+  }
+
+  return card;
+}
+
 function formatType(type) {
   return type === "meta_metric" ? "Meta-metric" : "Software metric";
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
