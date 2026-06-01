@@ -26,7 +26,7 @@
       "PEP 8 style violations",
       "syntax errors",
       "undefined names",
-      "import ordering",
+      "import placement",
       "line length"
     ]
   },
@@ -280,6 +280,796 @@
       "duplicate code blocks",
       "similar lines count",
       "clone pairs"
+    ]
+  },
+  {
+    "id": "tool-21",
+    "name": "SonarQube",
+    "language": "Java, JavaScript, Python, C#, C++",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "6",
+      "7",
+      "9",
+      "10",
+      "17"
+    ],
+    "metrics": [
+      "bugs",
+      "vulnerabilities",
+      "duplication",
+      "maintainability",
+      "cognitive complexity"
+    ]
+  },
+  {
+    "id": "tool-22",
+    "name": "ESLint",
+    "language": "JavaScript / TypeScript",
+    "category": "Style & errors",
+    "relatedMetricIds": [
+      "6"
+    ],
+    "metrics": [
+      "possible problems",
+      "style rule violations",
+      "unused variables",
+      "fixable rule violations"
+    ]
+  },
+  {
+    "id": "tool-23",
+    "name": "Black",
+    "language": "Python",
+    "category": "Formatter",
+    "relatedMetricIds": [],
+    "metrics": [
+      "formatting consistency"
+    ]
+  },
+  {
+    "id": "tool-24",
+    "name": "Checkstyle",
+    "language": "Java",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "naming conventions",
+      "formatting",
+      "imports",
+      "documentation rules"
+    ]
+  },
+  {
+    "id": "tool-25",
+    "name": "PMD",
+    "language": "Java",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "6",
+      "10"
+    ],
+    "metrics": [
+      "duplication",
+      "dead code",
+      "complexity",
+      "naming issues"
+    ]
+  },
+  {
+    "id": "tool-26",
+    "name": "SpotBugs",
+    "language": "Java",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "bug patterns",
+      "null pointers",
+      "concurrency issues"
+    ]
+  },
+  {
+    "id": "tool-27",
+    "name": "Semgrep",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "vulnerabilities",
+      "patterns",
+      "insecure code"
+    ]
+  },
+  {
+    "id": "tool-28",
+    "name": "Snyk Code",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "source code vulnerabilities",
+      "SAST findings",
+      "security dataflow issues"
+    ]
+  },
+  {
+    "id": "tool-29",
+    "name": "CodeScene",
+    "language": "Multi-language",
+    "category": "Behavioral analysis",
+    "relatedMetricIds": [
+      "7",
+      "11"
+    ],
+    "metrics": [
+      "maintainability",
+      "cognitive load",
+      "hotspots",
+      "code health"
+    ]
+  },
+  {
+    "id": "tool-30",
+    "name": "Code Climate Quality / Qlty Cloud",
+    "language": "Multi-language",
+    "category": "Maintainability",
+    "relatedMetricIds": [
+      "6",
+      "9",
+      "10"
+    ],
+    "metrics": [
+      "complexity",
+      "duplication",
+      "maintainability"
+    ]
+  },
+  {
+    "id": "tool-31",
+    "name": "DeepSource",
+    "language": "Multi-language",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "code quality",
+      "anti-patterns",
+      "security"
+    ]
+  },
+  {
+    "id": "tool-32",
+    "name": "Coverity",
+    "language": "C/C++, Java, C#",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "defects",
+      "security issues",
+      "reliability"
+    ]
+  },
+  {
+    "id": "tool-33",
+    "name": "cppcheck",
+    "language": "C/C++",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "memory leaks",
+      "undefined behavior",
+      "warnings"
+    ]
+  },
+  {
+    "id": "tool-34",
+    "name": "Clang-Tidy",
+    "language": "C/C++",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "readability",
+      "modern C++ practices",
+      "performance"
+    ]
+  },
+  {
+    "id": "tool-35",
+    "name": "RuboCop",
+    "language": "Ruby",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "style",
+      "formatting",
+      "naming conventions"
+    ]
+  },
+  {
+    "id": "tool-36",
+    "name": "PHPCS (PHP_CodeSniffer)",
+    "language": "PHP",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "coding standards",
+      "formatting",
+      "naming"
+    ]
+  },
+  {
+    "id": "tool-37",
+    "name": "Psalm",
+    "language": "PHP",
+    "category": "Type checking",
+    "relatedMetricIds": [],
+    "metrics": [
+      "type safety",
+      "bugs",
+      "maintainability"
+    ]
+  },
+  {
+    "id": "tool-38",
+    "name": "golangci-lint",
+    "language": "Go",
+    "category": "Style & errors",
+    "relatedMetricIds": [
+      "6"
+    ],
+    "metrics": [
+      "formatting",
+      "complexity",
+      "static analysis"
+    ]
+  },
+  {
+    "id": "tool-39",
+    "name": "ktlint",
+    "language": "Kotlin",
+    "category": "Formatter",
+    "relatedMetricIds": [],
+    "metrics": [
+      "formatting",
+      "style conventions"
+    ]
+  },
+  {
+    "id": "tool-40",
+    "name": "Detekt",
+    "language": "Kotlin",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "6"
+    ],
+    "metrics": [
+      "complexity",
+      "smells",
+      "readability"
+    ]
+  },
+  {
+    "id": "tool-41",
+    "name": "SwiftLint",
+    "language": "Swift",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "style rules",
+      "naming",
+      "formatting"
+    ]
+  },
+  {
+    "id": "tool-42",
+    "name": "StyleCop",
+    "language": "C#",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "naming",
+      "readability",
+      "formatting"
+    ]
+  },
+  {
+    "id": "tool-43",
+    "name": "Roslyn Analyzers",
+    "language": "C#",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "9"
+    ],
+    "metrics": [
+      "maintainability",
+      "API usage",
+      "style"
+    ]
+  },
+  {
+    "id": "tool-44",
+    "name": "Infer (Meta/Facebook)",
+    "language": "Java, C++, Obj-C",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "null dereference",
+      "resource leaks"
+    ]
+  },
+  {
+    "id": "tool-45",
+    "name": "LGTM / CodeQL",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "security",
+      "query-based analysis"
+    ]
+  },
+  {
+    "id": "tool-46",
+    "name": "Understand",
+    "language": "Multi-language",
+    "category": "Architecture",
+    "relatedMetricIds": [],
+    "metrics": [
+      "dependency analysis",
+      "architecture metrics"
+    ]
+  },
+  {
+    "id": "tool-47",
+    "name": "jscpd",
+    "language": "Multi-language",
+    "category": "Duplication",
+    "relatedMetricIds": [
+      "10"
+    ],
+    "metrics": [
+      "code duplication"
+    ]
+  },
+  {
+    "id": "tool-48",
+    "name": "JaCoCo",
+    "language": "Java",
+    "category": "Testing",
+    "relatedMetricIds": [
+      "8"
+    ],
+    "metrics": [
+      "code coverage"
+    ]
+  },
+  {
+    "id": "tool-49",
+    "name": "Istanbul / nyc",
+    "language": "JavaScript",
+    "category": "Testing",
+    "relatedMetricIds": [
+      "8"
+    ],
+    "metrics": [
+      "coverage metrics"
+    ]
+  },
+  {
+    "id": "tool-50",
+    "name": "PIT Mutation Testing",
+    "language": "Java",
+    "category": "Testing",
+    "relatedMetricIds": [
+      "47"
+    ],
+    "metrics": [
+      "test quality",
+      "mutation score"
+    ]
+  },
+  {
+    "id": "tool-51",
+    "name": "Stryker",
+    "language": "JavaScript, TypeScript, C#",
+    "category": "Testing",
+    "relatedMetricIds": [
+      "47"
+    ],
+    "metrics": [
+      "mutation score",
+      "test robustness"
+    ]
+  },
+  {
+    "id": "tool-52",
+    "name": "Dependabot",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17",
+      "18",
+      "19"
+    ],
+    "metrics": [
+      "outdated packages",
+      "insecure packages"
+    ]
+  },
+  {
+    "id": "tool-53",
+    "name": "OWASP Dependency-Check",
+    "language": "Java, .NET, Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17",
+      "18"
+    ],
+    "metrics": [
+      "vulnerable dependencies"
+    ]
+  },
+  {
+    "id": "tool-54",
+    "name": "Lizard",
+    "language": "Multi-language",
+    "category": "Complexity",
+    "relatedMetricIds": [
+      "6"
+    ],
+    "metrics": [
+      "cyclomatic complexity"
+    ]
+  },
+  {
+    "id": "tool-55",
+    "name": "SourceMeter",
+    "language": "Java, C#, Python",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "6",
+      "9"
+    ],
+    "metrics": [
+      "complexity",
+      "maintainability",
+      "documentation"
+    ]
+  },
+  {
+    "id": "tool-56",
+    "name": "Prettier",
+    "language": "JavaScript, TypeScript, HTML, CSS",
+    "category": "Formatter",
+    "relatedMetricIds": [],
+    "metrics": [
+      "formatting consistency"
+    ]
+  },
+  {
+    "id": "tool-57",
+    "name": "TSLint (legacy)",
+    "language": "TypeScript",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "style",
+      "naming",
+      "unused variables"
+    ]
+  },
+  {
+    "id": "tool-58",
+    "name": "Brakeman",
+    "language": "Ruby (Rails)",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "SQL injection",
+      "XSS",
+      "mass assignment"
+    ]
+  },
+  {
+    "id": "tool-59",
+    "name": "Reek",
+    "language": "Ruby",
+    "category": "Code smell detection",
+    "relatedMetricIds": [],
+    "metrics": [
+      "long methods",
+      "code smells",
+      "feature envy"
+    ]
+  },
+  {
+    "id": "tool-60",
+    "name": "ShellCheck",
+    "language": "Bash",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "syntax errors",
+      "quoting",
+      "portability"
+    ]
+  },
+  {
+    "id": "tool-61",
+    "name": "Hadolint",
+    "language": "Dockerfiles",
+    "category": "Style & errors",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "best practices",
+      "security issues"
+    ]
+  },
+  {
+    "id": "tool-62",
+    "name": "Trivy",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17",
+      "18",
+      "21"
+    ],
+    "metrics": [
+      "container vulnerabilities",
+      "IaC issues"
+    ]
+  },
+  {
+    "id": "tool-63",
+    "name": "KICS",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "Terraform misconfigurations",
+      "Kubernetes misconfigurations"
+    ]
+  },
+  {
+    "id": "tool-64",
+    "name": "PVS-Studio",
+    "language": "C/C++, C#, Java",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "bugs",
+      "concurrency",
+      "undefined behavior"
+    ]
+  },
+  {
+    "id": "tool-65",
+    "name": "Fortify Static Code Analyzer",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "vulnerabilities",
+      "dataflow issues"
+    ]
+  },
+  {
+    "id": "tool-66",
+    "name": "FindSecBugs",
+    "language": "Java",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "security smells",
+      "injection",
+      "crypto misuse"
+    ]
+  },
+  {
+    "id": "tool-67",
+    "name": "ArchUnit",
+    "language": "Java",
+    "category": "Architecture",
+    "relatedMetricIds": [],
+    "metrics": [
+      "layering rules",
+      "dependency constraints"
+    ]
+  },
+  {
+    "id": "tool-68",
+    "name": "SonarLint",
+    "language": "Multi-language",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "9"
+    ],
+    "metrics": [
+      "code smells",
+      "bugs",
+      "style"
+    ]
+  },
+  {
+    "id": "tool-69",
+    "name": "ESLint-Plugin-Security",
+    "language": "JavaScript / TypeScript",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "unsafe regex",
+      "eval",
+      "insecure patterns"
+    ]
+  },
+  {
+    "id": "tool-70",
+    "name": "Pyflakes",
+    "language": "Python",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "unused variables",
+      "imports"
+    ]
+  },
+  {
+    "id": "tool-71",
+    "name": "Pydocstyle",
+    "language": "Python",
+    "category": "Documentation",
+    "relatedMetricIds": [],
+    "metrics": [
+      "documentation quality"
+    ]
+  },
+  {
+    "id": "tool-72",
+    "name": "Pyre",
+    "language": "Python",
+    "category": "Type checking",
+    "relatedMetricIds": [],
+    "metrics": [
+      "type safety",
+      "nullability"
+    ]
+  },
+  {
+    "id": "tool-73",
+    "name": "Error Prone (Google)",
+    "language": "Java",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "bug patterns",
+      "nullability",
+      "misuse"
+    ]
+  },
+  {
+    "id": "tool-74",
+    "name": "FindBugs (legacy)",
+    "language": "Java",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "concurrency",
+      "null dereference"
+    ]
+  },
+  {
+    "id": "tool-75",
+    "name": "Checkmarx SAST",
+    "language": "Multi-language",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "vulnerabilities",
+      "dataflow"
+    ]
+  },
+  {
+    "id": "tool-76",
+    "name": "JSHint",
+    "language": "JavaScript",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "syntax",
+      "style"
+    ]
+  },
+  {
+    "id": "tool-77",
+    "name": "JSLint",
+    "language": "JavaScript",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "strict style rules"
+    ]
+  },
+  {
+    "id": "tool-78",
+    "name": "SonarJS",
+    "language": "JavaScript",
+    "category": "Static analysis",
+    "relatedMetricIds": [
+      "9"
+    ],
+    "metrics": [
+      "bugs",
+      "smells"
+    ]
+  },
+  {
+    "id": "tool-79",
+    "name": "TS-ESLint",
+    "language": "TypeScript",
+    "category": "Style & errors",
+    "relatedMetricIds": [],
+    "metrics": [
+      "type-aware linting"
+    ]
+  },
+  {
+    "id": "tool-80",
+    "name": "Flawfinder",
+    "language": "C/C++",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "unsafe functions",
+      "buffer overflow"
+    ]
+  },
+  {
+    "id": "tool-81",
+    "name": "RATS",
+    "language": "C/C++",
+    "category": "Security",
+    "relatedMetricIds": [
+      "17"
+    ],
+    "metrics": [
+      "vulnerabilities"
+    ]
+  },
+  {
+    "id": "tool-82",
+    "name": "Splint",
+    "language": "C",
+    "category": "Static analysis",
+    "relatedMetricIds": [],
+    "metrics": [
+      "annotations",
+      "memory safety"
     ]
   }
 ]
