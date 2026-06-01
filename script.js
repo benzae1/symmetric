@@ -5,14 +5,15 @@ const state = {
   filters: {
     search: "",
     type: "all",
-    categories: [],
+    category: "all",
+    tags: [],
     leadingLagging: "all",
     difficulty: "all",
     sort: "source"
   },
   toolFilters: {
     search: "",
-    language: "all",
+    languages: [],
     category: "all",
     metric: "all",
     relatedMetricId: "all"
@@ -38,8 +39,9 @@ const elements = {
   searchInput: document.querySelector("#searchInput"),
   typeFilter: document.querySelector("#typeFilter"),
   categoryFilter: document.querySelector("#categoryFilter"),
-  activeCategoryFilters: document.querySelector("#activeCategoryFilters"),
-  categoryChips: document.querySelector("#categoryChips"),
+  tagFilter: document.querySelector("#tagFilter"),
+  activeTagFilters: document.querySelector("#activeTagFilters"),
+  tagChips: document.querySelector("#tagChips"),
   leadingFilter: document.querySelector("#leadingFilter"),
   difficultyFilter: document.querySelector("#difficultyFilter"),
   sortFilter: document.querySelector("#sortFilter"),
@@ -53,6 +55,8 @@ const elements = {
   cardTemplate: document.querySelector("#metricCardTemplate"),
   toolSearchInput: document.querySelector("#toolSearchInput"),
   toolLanguageFilter: document.querySelector("#toolLanguageFilter"),
+  activeToolLanguageFilters: document.querySelector("#activeToolLanguageFilters"),
+  toolLanguageChips: document.querySelector("#toolLanguageChips"),
   toolCategoryFilter: document.querySelector("#toolCategoryFilter"),
   toolMetricFilter: document.querySelector("#toolMetricFilter"),
   toolResetButton: document.querySelector("#toolResetButton"),
@@ -109,11 +113,18 @@ async function loadTools() {
     }
 
     const tools = await response.json();
-    state.tools = tools.map((tool, index) => ({
-      ...tool,
-      sourceOrder: index,
-      searchText: buildToolSearchText(tool)
-    }));
+    state.tools = tools.map((tool, index) => {
+      const normalizedTool = {
+        ...tool,
+        languages: normalizeLanguages(tool),
+        sourceOrder: index
+      };
+
+      return {
+        ...normalizedTool,
+        searchText: buildToolSearchText(normalizedTool)
+      };
+    });
 
     populateToolFilters();
   } catch (error) {
@@ -146,11 +157,16 @@ function bindEvents() {
   });
 
   elements.categoryFilter.addEventListener("change", (event) => {
-    const selectedCategory = event.target.value;
-    if (selectedCategory && !state.filters.categories.includes(selectedCategory)) {
-      state.filters.categories = [...state.filters.categories, selectedCategory];
+    state.filters.category = event.target.value;
+    render();
+  });
+
+  elements.tagFilter.addEventListener("change", (event) => {
+    const selectedTag = event.target.value;
+    if (selectedTag && !state.filters.tags.includes(selectedTag)) {
+      state.filters.tags = [...state.filters.tags, selectedTag];
     }
-    elements.categoryFilter.value = "";
+    elements.tagFilter.value = "";
     render();
   });
 
@@ -177,7 +193,11 @@ function bindEvents() {
   });
 
   elements.toolLanguageFilter.addEventListener("change", (event) => {
-    state.toolFilters.language = event.target.value;
+    const selectedLanguage = event.target.value;
+    if (selectedLanguage && !state.toolFilters.languages.includes(selectedLanguage)) {
+      state.toolFilters.languages = [...state.toolFilters.languages, selectedLanguage];
+    }
+    elements.toolLanguageFilter.value = "";
     renderTools();
   });
 
@@ -228,7 +248,7 @@ function buildMetricSearchText(metric) {
 function buildToolSearchText(tool) {
   return [
     tool.name,
-    tool.language,
+    ...(tool.languages || normalizeLanguages(tool)),
     tool.category,
     ...(tool.metrics || [])
   ]
@@ -240,8 +260,14 @@ function buildToolSearchText(tool) {
 function populateStaticFilters() {
   populateOptions(
     elements.categoryFilter,
-    "Add a category filter",
-    getUniqueValues(state.metrics.map((metric) => metric.category)),
+    "All categories",
+    getUniqueValues(state.metrics.map((metric) => metric.category))
+  );
+
+  populateOptions(
+    elements.tagFilter,
+    "Add a tag",
+    getUniqueValues(state.metrics.flatMap((metric) => metric.tags || [])),
     defaultSort,
     ""
   );
@@ -259,8 +285,10 @@ function populateStaticFilters() {
 function populateToolFilters() {
   populateOptions(
     elements.toolLanguageFilter,
-    "All languages",
-    getUniqueValues(state.tools.map((tool) => tool.language))
+    "Add a language",
+    getUniqueValues(state.tools.flatMap((tool) => tool.languages || [])),
+    defaultSort,
+    ""
   );
 
   populateOptions(
@@ -325,6 +353,31 @@ function getUniqueValues(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function normalizeLanguages(tool) {
+  if (Array.isArray(tool.languages)) {
+    return tool.languages;
+  }
+
+  if (!tool.language) {
+    return [];
+  }
+
+  return String(tool.language)
+    .split(/\s*(?:,|\/)\s*/)
+    .map((language) => language.trim())
+    .map((language) => {
+      const aliases = {
+        "Dockerfiles": "Dockerfile",
+        "Obj-C": "Objective-C",
+        "Ruby (Rails)": "Ruby",
+        "JS": "JavaScript",
+        "TS": "TypeScript"
+      };
+      return aliases[language] || language;
+    })
+    .filter(Boolean);
+}
+
 function sortDifficultyValues(a, b) {
   return (difficultyOrder[a] || Number.MAX_SAFE_INTEGER) - (difficultyOrder[b] || Number.MAX_SAFE_INTEGER);
 }
@@ -337,7 +390,8 @@ function resetFilters() {
   state.filters = {
     search: "",
     type: "all",
-    categories: [],
+    category: "all",
+    tags: [],
     leadingLagging: "all",
     difficulty: "all",
     sort: "source"
@@ -345,7 +399,8 @@ function resetFilters() {
 
   elements.searchInput.value = "";
   elements.typeFilter.value = "all";
-  elements.categoryFilter.value = "";
+  elements.categoryFilter.value = "all";
+  elements.tagFilter.value = "";
   elements.difficultyFilter.value = "all";
   elements.sortFilter.value = "source";
   updateLeadingFilterState();
@@ -357,14 +412,14 @@ function resetFilters() {
 function resetToolFilters() {
   state.toolFilters = {
     search: "",
-    language: "all",
+    languages: [],
     category: "all",
     metric: "all",
     relatedMetricId: "all"
   };
 
   elements.toolSearchInput.value = "";
-  elements.toolLanguageFilter.value = "all";
+  elements.toolLanguageFilter.value = "";
   elements.toolCategoryFilter.value = "all";
   elements.toolMetricFilter.value = "all";
 
@@ -379,7 +434,7 @@ function render() {
   const total = state.metrics.length;
   elements.resultsCount.innerHTML = `<strong>${count}</strong> of ${total} metric${total === 1 ? "" : "s"} shown`;
   elements.resultsSummary.innerHTML = buildSummary();
-  renderCategoryChips();
+  renderTagChips();
 
   elements.cardsContainer.innerHTML = "";
   elements.emptyState.hidden = count > 0;
@@ -404,6 +459,7 @@ function renderTools() {
   const total = state.tools.length;
   elements.toolResultsCount.innerHTML = `<strong>${count}</strong> of ${total} tool${total === 1 ? "" : "s"} shown`;
   elements.toolResultsSummary.innerHTML = buildToolSummary();
+  renderToolLanguageChips();
 
   elements.toolCardsContainer.innerHTML = "";
   elements.toolEmptyState.hidden = count > 0;
@@ -434,8 +490,11 @@ function buildSummary() {
   if (state.filters.type !== "all") {
     parts.push(`<span>${formatType(state.filters.type)}</span>`);
   }
-  if (state.filters.categories.length > 0) {
-    parts.push(`Categories <span>${escapeHtml(state.filters.categories.join(", "))}</span>`);
+  if (state.filters.category !== "all") {
+    parts.push(`Category <span>${escapeHtml(state.filters.category)}</span>`);
+  }
+  if (state.filters.tags.length > 0) {
+    parts.push(`Tags include <span>${escapeHtml(state.filters.tags.join(" + "))}</span>`);
   }
   if (state.filters.difficulty !== "all") {
     parts.push(`<span>${escapeHtml(state.filters.difficulty)}</span>`);
@@ -460,8 +519,8 @@ function buildToolSummary() {
     }
   }
 
-  if (state.toolFilters.language !== "all") {
-    parts.push(`<span>${escapeHtml(state.toolFilters.language)}</span>`);
+  if (state.toolFilters.languages.length > 0) {
+    parts.push(`Languages include <span>${escapeHtml(state.toolFilters.languages.join(" + "))}</span>`);
   }
   if (state.toolFilters.category !== "all") {
     parts.push(`<span>${escapeHtml(state.toolFilters.category)}</span>`);
@@ -480,8 +539,10 @@ function applyFilters(metrics) {
   return metrics.filter((metric) => {
     const matchesSearch = !state.filters.search || metric.searchText.includes(state.filters.search);
     const matchesType = state.filters.type === "all" || metric.type === state.filters.type;
-    const matchesCategory =
-      state.filters.categories.length === 0 || state.filters.categories.includes(metric.category);
+    const matchesCategory = state.filters.category === "all" || metric.category === state.filters.category;
+    const metricTags = metric.tags || [];
+    const matchesTags =
+      state.filters.tags.length === 0 || state.filters.tags.every((tag) => metricTags.includes(tag));
 
     const leadingValue = metric.leadingLagging || "Not applicable";
     const matchesLeading =
@@ -490,14 +551,17 @@ function applyFilters(metrics) {
     const matchesDifficulty =
       state.filters.difficulty === "all" || metric.difficulty === state.filters.difficulty;
 
-    return matchesSearch && matchesType && matchesCategory && matchesLeading && matchesDifficulty;
+    return matchesSearch && matchesType && matchesCategory && matchesTags && matchesLeading && matchesDifficulty;
   });
 }
 
 function applyToolFilters(tools) {
   return tools.filter((tool) => {
     const matchesSearch = !state.toolFilters.search || tool.searchText.includes(state.toolFilters.search);
-    const matchesLanguage = state.toolFilters.language === "all" || tool.language === state.toolFilters.language;
+    const toolLanguages = tool.languages || normalizeLanguages(tool);
+    const matchesLanguage =
+      state.toolFilters.languages.length === 0 ||
+      state.toolFilters.languages.every((language) => toolLanguages.includes(language));
     const matchesCategory = state.toolFilters.category === "all" || tool.category === state.toolFilters.category;
     const matchesMetric =
       state.toolFilters.metric === "all" || (tool.metrics || []).includes(state.toolFilters.metric);
@@ -509,26 +573,49 @@ function applyToolFilters(tools) {
   });
 }
 
-function renderCategoryChips() {
-  elements.categoryChips.innerHTML = "";
-  const hasCategories = state.filters.categories.length > 0;
-  elements.activeCategoryFilters.hidden = !hasCategories;
+function renderTagChips() {
+  elements.tagChips.innerHTML = "";
+  const hasTags = state.filters.tags.length > 0;
+  elements.activeTagFilters.hidden = !hasTags;
 
-  if (!hasCategories) {
+  if (!hasTags) {
     return;
   }
 
-  for (const category of state.filters.categories) {
+  for (const tag of state.filters.tags) {
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = "chip";
-    chip.setAttribute("aria-label", `Remove category filter ${category}`);
-    chip.innerHTML = `<span>${escapeHtml(category)}</span><span class="chip__remove" aria-hidden="true">x</span>`;
+    chip.setAttribute("aria-label", `Remove required tag ${tag}`);
+    chip.innerHTML = `<span>${escapeHtml(tag)}</span><span class="chip__remove" aria-hidden="true">x</span>`;
     chip.addEventListener("click", () => {
-      state.filters.categories = state.filters.categories.filter((value) => value !== category);
+      state.filters.tags = state.filters.tags.filter((value) => value !== tag);
       render();
     });
-    elements.categoryChips.append(chip);
+    elements.tagChips.append(chip);
+  }
+}
+
+function renderToolLanguageChips() {
+  elements.toolLanguageChips.innerHTML = "";
+  const hasLanguages = state.toolFilters.languages.length > 0;
+  elements.activeToolLanguageFilters.hidden = !hasLanguages;
+
+  if (!hasLanguages) {
+    return;
+  }
+
+  for (const language of state.toolFilters.languages) {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.setAttribute("aria-label", `Remove required language ${language}`);
+    chip.innerHTML = `<span>${escapeHtml(language)}</span><span class="chip__remove" aria-hidden="true">x</span>`;
+    chip.addEventListener("click", () => {
+      state.toolFilters.languages = state.toolFilters.languages.filter((value) => value !== language);
+      renderTools();
+    });
+    elements.toolLanguageChips.append(chip);
   }
 }
 
@@ -645,7 +732,7 @@ function createRelatedToolChip(tool) {
 
   const meta = document.createElement("p");
   meta.className = "related-tool__meta";
-  meta.textContent = `${tool.language} | ${tool.category}`;
+  meta.textContent = `${formatLanguages(tool)} | ${tool.category}`;
 
   article.append(name, meta);
   return article;
@@ -674,7 +761,13 @@ function openToolFinderForMetric(metricId) {
 function createToolCard(tool) {
   const card = elements.toolCardTemplate.content.firstElementChild.cloneNode(true);
 
-  card.querySelector(".tool-card__eyebrow").textContent = tool.language;
+  const languageList = card.querySelector(".tool-card__languages");
+  for (const language of tool.languages || normalizeLanguages(tool)) {
+    const item = document.createElement("li");
+    item.textContent = language;
+    languageList.append(item);
+  }
+
   card.querySelector(".tool-card__title").textContent = tool.name;
   card.querySelector(".tool-card__category").textContent = tool.category;
 
@@ -686,6 +779,10 @@ function createToolCard(tool) {
   }
 
   return card;
+}
+
+function formatLanguages(tool) {
+  return (tool.languages || normalizeLanguages(tool)).join(", ");
 }
 
 function formatType(type) {

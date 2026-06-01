@@ -81,7 +81,14 @@
           <label class="field" for="categoryFilter">
             <span>Category</span>
             <select id="categoryFilter" name="category">
-              <option value="">Add a category filter</option>
+              <option value="all">All categories</option>
+            </select>
+          </label>
+
+          <label class="field" for="tagFilter">
+            <span>Required tag</span>
+            <select id="tagFilter" name="tag">
+              <option value="">Add a tag</option>
             </select>
           </label>
 
@@ -113,9 +120,9 @@
           </div>
         </div>
 
-        <div id="activeCategoryFilters" class="active-filters" hidden aria-live="polite">
-          <span class="active-filters__label">Active categories</span>
-          <div id="categoryChips" class="chips"></div>
+        <div id="activeTagFilters" class="active-filters" hidden aria-live="polite">
+          <span class="active-filters__label">Required tags</span>
+          <div id="tagChips" class="chips"></div>
         </div>
       </section>
 
@@ -155,7 +162,7 @@
           <label class="field" for="toolLanguageFilter">
             <span>Programming language</span>
             <select id="toolLanguageFilter" name="toolLanguage">
-              <option value="all">All languages</option>
+              <option value="">Add a language</option>
             </select>
           </label>
 
@@ -172,6 +179,11 @@
               <option value="all">All metrics</option>
             </select>
           </label>
+        </div>
+
+        <div id="activeToolLanguageFilters" class="active-filters" hidden aria-live="polite">
+          <span class="active-filters__label">Required languages</span>
+          <div id="toolLanguageChips" class="chips"></div>
         </div>
       </section>
 
@@ -240,7 +252,7 @@
   <template id="toolCardTemplate">
     <article class="tool-card">
       <div class="tool-card__head">
-        <p class="tool-card__eyebrow"></p>
+        <ul class="tool-card__languages" aria-label="Supported languages"></ul>
         <h2 class="tool-card__title"></h2>
       </div>
       <p class="tool-card__category"></p>
