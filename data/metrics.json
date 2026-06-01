@@ -1,1122 +1,1116 @@
 [
-    {
-        "id":  "1",
-        "type":  "software_metric",
-        "name":  "Deployment Frequency (DF)",
-        "category":  "DORA",
-        "shortDescription":  "How often code is successfully released to production.",
-        "measurement":  "Count of successful production deployment events per time window from CI/CD logs (GitHub Actions, GitLab, Jenkins, Spinnaker, Argo). DORA \"elite\" is approximately on-demand or multiple times per day.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Pure event count; main challenge is consistent definition of \"production\" and \"deployment.\"",
-        "tags":  [
-                     "ci/cd",
-                     "dora",
-                     "leading",
-                     "observability",
-                     "velocity"
-                 ]
-    },
-    {
-        "id":  "2",
-        "type":  "software_metric",
-        "name":  "Lead Time for Changes (LTC)",
-        "category":  "DORA",
-        "shortDescription":  "Time from code commit (or PR open) to that change running in production.",
-        "measurement":  "timestamp(deploy) - timestamp(commit) aggregated as median or percentile. Computed by GitLab Value Stream Analytics, LinearB, DX, and Jellyfish.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires joining VCS + CI + deploy data; commit-time vs. PR-open-time choice changes the number materially.",
-        "tags":  [
-                     "ci/cd",
-                     "dora",
-                     "lagging",
-                     "team productivity",
-                     "velocity"
-                 ]
-    },
-    {
-        "id":  "3",
-        "type":  "software_metric",
-        "name":  "Change Failure Rate (CFR)",
-        "category":  "DORA",
-        "shortDescription":  "% of deployments that cause a production incident, rollback, or hotfix.",
-        "measurement":  "failed_deployments / total_deployments. Requires linking incidents/rollbacks back to specific deployments.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Hard",
-        "difficultyJustification":  "\"Failure\" definition varies (incident? rollback? hotfix within X hours?), and incident-to-deploy linkage is often manual.",
-        "tags":  [
-                     "ci/cd",
-                     "dora",
-                     "lagging",
-                     "reliability",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "4",
-        "type":  "software_metric",
-        "name":  "Mean Time to Restore/Recover (MTTR - DORA)",
-        "category":  "DORA",
-        "shortDescription":  "Average time from production incident start to service restored.",
-        "measurement":  "sum(downtime) / number_of_incidents. Sourced from incident-management tools such as PagerDuty, Opsgenie, and ServiceNow. DORA elite is under 1 hour.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Skewed by outliers; depends on incident-start definition (alert fire vs. customer impact start). Median/p90 is often more honest than mean.",
-        "tags":  [
-                     "ci/cd",
-                     "dora",
-                     "lagging",
-                     "reliability",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "5",
-        "type":  "software_metric",
-        "name":  "Reliability (5th DORA metric)",
-        "category":  "DORA",
-        "shortDescription":  "Composite signal of whether services meet their reliability targets (SLOs) over time.",
-        "measurement":  "Usually tracked as the share of service-level objectives met across services in a reporting window; some teams instead summarize weighted error-budget consumption.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires a mature SLO program; aggregation across services is subjective.",
-        "tags":  [
-                     "dora",
-                     "lagging",
-                     "reliability",
-                     "slo",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "6",
-        "type":  "software_metric",
-        "name":  "Cyclomatic Complexity (McCabe)",
-        "category":  "Code quality",
-        "shortDescription":  "Number of linearly independent paths through a function: 1 + number_of_conditional_branches.",
-        "measurement":  "Static analysis: SonarQube, ESLint complexity rules, radon (Python), lizard, PMD. Computed per function and summed.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Deterministic and tool-supported; interpretation thresholds (\u003e10 risky, \u003e20 high-risk) vary by language.",
-        "tags":  [
-                     "code quality",
-                     "leading",
-                     "reliability",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "7",
-        "type":  "software_metric",
-        "name":  "Cognitive Complexity",
-        "category":  "Code quality",
-        "shortDescription":  "How hard code is for a human to understand (penalizes nesting and breaks in linear flow).",
-        "measurement":  "SonarSource\u0027s algorithm in SonarQube; differs from McCabe by weighting nested structures.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Tool support makes calculation straightforward; the metric itself is opinionated.",
-        "tags":  [
-                     "code quality",
-                     "leading"
-                 ]
-    },
-    {
-        "id":  "8",
-        "type":  "software_metric",
-        "name":  "Code Coverage (line / statement / branch / condition)",
-        "category":  "Testing",
-        "shortDescription":  "% of code (lines, branches, or conditions) executed by tests.",
-        "measurement":  "Coverage instrumentation: JaCoCo, Coverage.py, Istanbul/nyc, gcov, Codecov, Coveralls. Branch coverage stricter than line.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Calculation is straightforward, but interpreting the result correctly is difficult. 100% coverage does not imply correctness; it is necessary-but-not-sufficient.",
-        "tags":  [
-                     "leading",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "9",
-        "type":  "software_metric",
-        "name":  "Technical Debt Ratio (SQALE)",
-        "category":  "Code quality",
-        "shortDescription":  "Ratio of estimated remediation cost to total development cost. SonarQube: remediation_cost / development_cost.",
-        "measurement":  "SonarQube SQALE model assigns minutes per issue; development cost is approximated as LOC x cost_per_line.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Depends on rule set and remediation-effort estimates baked into the tool; cross-org comparisons are weak.",
-        "tags":  [
-                     "code quality",
-                     "lagging",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "10",
-        "type":  "software_metric",
-        "name":  "Code Duplication",
-        "category":  "Code quality",
-        "shortDescription":  "% of code that is duplicated (clone detection).",
-        "measurement":  "SonarQube duplication detector, PMD CPD, jscpd. Reported as duplicated_lines / total_lines.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Tool-driven; threshold for \"duplicate\" (token count) is configurable.",
-        "tags":  [
-                     "code quality",
-                     "leading"
-                 ]
-    },
-    {
-        "id":  "11",
-        "type":  "software_metric",
-        "name":  "Code Churn",
-        "category":  "Code quality",
-        "shortDescription":  "Lines added/changed/deleted over a window, often within N days of being written.",
-        "measurement":  "Git log analysis; tools like CodeScene, GitPrime/Pluralsight Flow. High churn correlates with defect rate (Nagappan \u0026 Ball, MSR).",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Trivial to compute; interpreting \"good vs. bad\" churn requires baseline.",
-        "tags":  [
-                     "code quality",
-                     "leading",
-                     "risk"
-                 ]
-    },
-    {
-        "id":  "12",
-        "type":  "software_metric",
-        "name":  "Build Success Rate",
-        "category":  "CI/CD",
-        "shortDescription":  "% of CI builds passing on first attempt.",
-        "measurement":  "successful_builds / total_builds from CI APIs such as Jenkins, GitHub Actions, Buildkite, and CircleCI. Elite teams often target \u003e= 90% on the default branch.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Direct from CI logs; partition by branch (feature vs. main) for fair signal.",
-        "tags":  [
-                     "ci/cd",
-                     "leading"
-                 ]
-    },
-    {
-        "id":  "13",
-        "type":  "software_metric",
-        "name":  "Pipeline Duration",
-        "category":  "CI/CD",
-        "shortDescription":  "Wall-clock time from pipeline trigger to completion.",
-        "measurement":  "CI platform analytics measuring wall-clock time from pipeline trigger to final completion, typically tracked as median and p95 with queue time broken out separately.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Build/queue split aids diagnosis.",
-        "tags":  [
-                     "ci/cd",
-                     "leading"
-                 ]
-    },
-    {
-        "id":  "14",
-        "type":  "software_metric",
-        "name":  "Queue Time",
-        "category":  "CI/CD",
-        "shortDescription":  "Time builds wait before an executor picks them up.",
-        "measurement":  "CI scheduler timestamps, usually captured directly from Jenkins, GitHub Actions, Buildkite, or similar CI platforms.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Some CI tools expose it natively; others require log scraping.",
-        "tags":  [
-                     "ci/cd",
-                     "executor capacity",
-                     "leading",
-                     "pipeline performance"
-                 ]
-    },
-    {
-        "id":  "15",
-        "type":  "software_metric",
-        "name":  "Flaky Test Rate",
-        "category":  "Testing",
-        "shortDescription":  "% of tests that have failed and then passed without code change in a window.",
-        "measurement":  "Cross-reference test-run history with git diffs; tools: Buildkite Test Analytics, CircleCI Test Insights, Atlassian Flakinator, Datadog CI Visibility. Empirically, Google reports ~16% of test failures are flaky; Microsoft ~13%.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Requires correlating runs to code state; many CIs do not natively distinguish flake from real failure.",
-        "tags":  [
-                     "ci/cd",
-                     "flakiness",
-                     "leading",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "16",
-        "type":  "software_metric",
-        "name":  "Mean Time to Green (MTTG)",
-        "category":  "CI/CD",
-        "shortDescription":  "Time from PR open until CI is green.",
-        "measurement":  "Join pull request timestamps with CI run results to measure time from PR open until the default required checks are green.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Depends on flake handling and rerun policies.",
-        "tags":  [
-                     "ci/cd",
-                     "leading",
-                     "pull request",
-                     "team productivity"
-                 ]
-    },
-    {
-        "id":  "17",
-        "type":  "software_metric",
-        "name":  "Vulnerability Density",
-        "category":  "Security",
-        "shortDescription":  "Open vulnerabilities per asset (or per KLOC).",
-        "measurement":  "Counts from SCA/SAST/DAST scanners (Snyk, Dependabot, Tenable, Qualys, Wiz) divided by inventory.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Sensitive to scanner coverage and CVE deduplication; not comparable across tools.",
-        "tags":  [
-                     "lagging",
-                     "security"
-                 ]
-    },
-    {
-        "id":  "18",
-        "type":  "software_metric",
-        "name":  "MTTR for CVEs / Mean Time to Remediate",
-        "category":  "Security",
-        "shortDescription":  "Average time from vulnerability detection to verified fix.",
-        "measurement":  "sum(close_time - detect_time) / count, sliced by severity. Edgescan\u0027s 2023 report puts industry-wide critical MTTR at approximately 65 days.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Detection timestamp varies by source (scan run vs. CVE disclosure).",
-        "tags":  [
-                     "lagging",
-                     "remediation",
-                     "security",
-                     "vulnerability management"
-                 ]
-    },
-    {
-        "id":  "19",
-        "type":  "software_metric",
-        "name":  "Mean Time to Patch (MTTP) / Patch Lag",
-        "category":  "Security",
-        "shortDescription":  "Gap between vendor patch release and deployment in the environment.",
-        "measurement":  "Patch-deploy timestamp minus vendor-release timestamp; tracked in patch-management tools (WSUS, Tanium, JAMF).",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires authoritative inventory and vendor patch metadata.",
-        "tags":  [
-                     "lagging",
-                     "patch management",
-                     "patching",
-                     "security"
-                 ]
-    },
-    {
-        "id":  "20",
-        "type":  "software_metric",
-        "name":  "Patch Compliance Rate",
-        "category":  "Security",
-        "shortDescription":  "% of in-scope assets within patch-SLA.",
-        "measurement":  "Asset-level patch compliance states aggregated by severity tier, business unit, or environment against a defined remediation SLA.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Asset inventory completeness is usually the bottleneck.",
-        "tags":  [
-                     "lagging",
-                     "patch compliance",
-                     "security",
-                     "sla"
-                 ]
-    },
-    {
-        "id":  "21",
-        "type":  "software_metric",
-        "name":  "Scanner / Inventory Coverage",
-        "category":  "Security",
-        "shortDescription":  "% of assets actually scanned within the last cycle.",
-        "measurement":  "(asset inventory intersection scanned assets) / asset inventory, usually measured per scan cycle to show how much of the known environment is actually being assessed.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Shadow IT and ephemeral cloud assets degrade accuracy.",
-        "tags":  [
-                     "asset inventory",
-                     "leading",
-                     "scanner coverage",
-                     "security"
-                 ]
-    },
-    {
-        "id":  "22",
-        "type":  "software_metric",
-        "name":  "MTTF (Mean Time To Failure)",
-        "category":  "SRE",
-        "shortDescription":  "Average operational time before a non-repairable component fails.",
-        "measurement":  "total_operational_time / number_of_failures. Used for hardware-style or replaceable components.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Hard for software (often poorly defined; software is typically repairable, so MTBF is more appropriate).",
-        "tags":  [
-                     "lagging",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "23",
-        "type":  "software_metric",
-        "name":  "MTBF (Mean Time Between Failures)",
-        "category":  "SRE",
-        "shortDescription":  "Average uptime between failures for repairable systems.",
-        "measurement":  "MTTF + MTTR or total_uptime / number_of_failures. Availability = MTBF / (MTBF + MTTR).",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Easily gamed by raising the threshold of what counts as an incident.",
-        "tags":  [
-                     "lagging",
-                     "operational",
-                     "reliability",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "24",
-        "type":  "software_metric",
-        "name":  "MTTD (Mean Time to Detect)",
-        "category":  "SRE",
-        "shortDescription":  "Time from failure onset until monitoring/team becomes aware.",
-        "measurement":  "sum(alert_time - failure_start_time) / count. Needs ground truth on when failure actually began, often from forensic log review rather than alerts.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Hard",
-        "difficultyJustification":  "True failure-start is rarely known precisely; many teams understate MTTD by using alert-fire as start.",
-        "tags":  [
-                     "leading",
-                     "sre",
-                     "team productivity"
-                 ]
-    },
-    {
-        "id":  "25",
-        "type":  "software_metric",
-        "name":  "MTTA (Mean Time to Acknowledge)",
-        "category":  "SRE",
-        "shortDescription":  "Time from alert page to human acknowledgement.",
-        "measurement":  "PagerDuty, Opsgenie, or similar incident-management analytics comparing page time with acknowledgement time.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Direct from incident tool.",
-        "tags":  [
-                     "incident response",
-                     "leading",
-                     "pager",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "26",
-        "type":  "software_metric",
-        "name":  "SLI (Service Level Indicator)",
-        "category":  "SRE",
-        "shortDescription":  "Quantitative measure of service behavior, e.g., good_requests / total_requests, p99 latency.",
-        "measurement":  "Computed from logs, metrics (Prometheus, Datadog, New Relic), or synthetic checks.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Choosing \"good event\" predicates and request scopes is the hard part.",
-        "tags":  [
-                     "leading",
-                     "observability",
-                     "operational",
-                     "reliability",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "27",
-        "type":  "software_metric",
-        "name":  "SLO Compliance",
-        "category":  "SRE",
-        "shortDescription":  "% of measurement window in which SLI met its objective.",
-        "measurement":  "Burn-rate calculation against an SLO target (e.g., 99.9%). Tools: Sloth, Nobl9, Datadog SLO, Grafana SLO.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Definition of valid traffic and exclusions (planned maintenance) is contentious.",
-        "tags":  [
-                     "lagging",
-                     "observability",
-                     "reliability",
-                     "security",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "28",
-        "type":  "software_metric",
-        "name":  "Error Budget",
-        "category":  "SRE",
-        "shortDescription":  "Allowed unreliability per window = 1 - SLO. For 99.9% over 30 days, that is approximately 43 minutes.",
-        "measurement":  "Derived from the SLO as 1 - target reliability, then tracked through burn-rate alerts and cumulative consumption over the reporting window.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Easy formula, but operational use requires organizational buy-in.",
-        "tags":  [
-                     "error budget",
-                     "leading",
-                     "reliability",
-                     "slo",
-                     "sre"
-                 ]
-    },
-    {
-        "id":  "29",
-        "type":  "software_metric",
-        "name":  "Toil Fraction",
-        "category":  "SRE",
-        "shortDescription":  "% of engineer time spent on manual, repetitive ops work.",
-        "measurement":  "Self-reported time tracking, ticket tagging, or calendar analysis estimating the share of engineer time spent on repetitive operational work. The Google SRE book suggests keeping this below 50%.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Almost entirely self-reported; subject to recall and definition bias.",
-        "tags":  [
-                     "lagging",
-                     "manual work",
-                     "sre",
-                     "toil"
-                 ]
-    },
-    {
-        "id":  "30",
-        "type":  "software_metric",
-        "name":  "PR Cycle Time",
-        "category":  "Team productivity",
-        "shortDescription":  "End-to-end time from PR opened to merged (sometimes to deploy).",
-        "measurement":  "Git host APIs or engineering analytics tools measuring elapsed time from PR creation to merge, and sometimes onward to deployment.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Sensitive to draft-PR practices and squash-merge conventions.",
-        "tags":  [
-                     "cycle time",
-                     "leading",
-                     "pull request",
-                     "team productivity",
-                     "velocity"
-                 ]
-    },
-    {
-        "id":  "31",
-        "type":  "software_metric",
-        "name":  "PR Review Turnaround / Pickup Time",
-        "category":  "Team productivity",
-        "shortDescription":  "Hours from PR opened to first substantive review.",
-        "measurement":  "Git host webhook or API timestamps comparing PR creation time with the first substantive review event.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Often the largest hidden contributor to cycle time.",
-        "tags":  [
-                     "code review",
-                     "leading",
-                     "pull request",
-                     "team productivity"
-                 ]
-    },
-    {
-        "id":  "32",
-        "type":  "software_metric",
-        "name":  "PR Size",
-        "category":  "Team productivity",
-        "shortDescription":  "Lines or files changed per PR.",
-        "measurement":  "Git diff statistics such as lines changed or files touched per PR, often analyzed against review speed, merge time, or downstream defect rates.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "LOC is noisy across languages.",
-        "tags":  [
-                     "code review",
-                     "leading",
-                     "pull request",
-                     "team productivity"
-                 ]
-    },
-    {
-        "id":  "33",
-        "type":  "software_metric",
-        "name":  "Throughput",
-        "category":  "Team productivity",
-        "shortDescription":  "Issues, stories, or PRs completed per unit time.",
-        "measurement":  "Counts of issues, stories, tickets, or PRs completed per time window using sources such as Jira, Linear, or GitHub Projects.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Easy to count, Hard to interpret (story points are subjective).",
-        "tags":  [
-                     "delivery",
-                     "lagging",
-                     "team productivity",
-                     "throughput",
-                     "velocity"
-                 ]
-    },
-    {
-        "id":  "34",
-        "type":  "software_metric",
-        "name":  "Work in Progress (WIP)",
-        "category":  "Team productivity",
-        "shortDescription":  "Items concurrently in-flight per team or person.",
-        "measurement":  "Pulled from the issue tracker. Little\u0027s Law: WIP = throughput x cycle_time.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Definition of \"in progress\" status must be agreed.",
-        "tags":  [
-                     "flow",
-                     "leading",
-                     "team productivity",
-                     "throughput",
-                     "wip"
-                 ]
-    },
-    {
-        "id":  "35",
-        "type":  "software_metric",
-        "name":  "Rework Rate",
-        "category":  "Team productivity",
-        "shortDescription":  "% of code changed within N days of being merged.",
-        "measurement":  "Git churn analysis identifying the percentage of code that is modified again within a chosen window after merge, often using tools such as CodeScene or GitPrime.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Window choice matters; legitimate iteration looks like rework.",
-        "tags":  [
-                     "code churn",
-                     "lagging",
-                     "rework",
-                     "team productivity"
-                 ]
-    },
-    {
-        "id":  "36",
-        "type":  "software_metric",
-        "name":  "Sprint Goal Completion Rate",
-        "category":  "Team productivity",
-        "shortDescription":  "% of committed sprint scope delivered.",
-        "measurement":  "Jira, Linear, or similar sprint reports comparing committed scope with completed scope at sprint end.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Straightforward to compute, but teams can game it by under-committing or redefining scope mid-sprint.",
-        "tags":  [
-                     "agile",
-                     "lagging",
-                     "planning",
-                     "team productivity"
-                 ]
-    },
-    {
-        "id":  "37",
-        "type":  "software_metric",
-        "name":  "Latency (request)",
-        "category":  "Operational",
-        "shortDescription":  "Time from request to response, usually as p50/p95/p99 distribution.",
-        "measurement":  "Latency distributions from APM or observability systems such as Prometheus histograms, Datadog, or OpenTelemetry, usually reported as p50, p95, and p99.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "The long tail (p99) is the meaningful number.",
-        "tags":  [
-                     "latency",
-                     "leading",
-                     "observability",
-                     "operational"
-                 ]
-    },
-    {
-        "id":  "38",
-        "type":  "software_metric",
-        "name":  "Traffic / Request Rate (R in RED, Traffic Golden Signal)",
-        "category":  "Operational",
-        "shortDescription":  "Requests per second served.",
-        "measurement":  "APM or observability counter metrics, usually expressed as requests per second over time.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Simple counter-based metric, though teams still need to define which requests count toward the total.",
-        "tags":  [
-                     "leading",
-                     "observability",
-                     "operational"
-                 ]
-    },
-    {
-        "id":  "39",
-        "type":  "software_metric",
-        "name":  "Error Rate (E in RED, Errors Golden Signal)",
-        "category":  "Operational",
-        "shortDescription":  "Failed requests / total requests.",
-        "measurement":  "Error counters from logs or metrics, usually calculated as failed requests divided by total requests, with 5xx responses, timeouts, and uncaught exceptions included.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Definition of \"error\" needs care (4xx often excluded).",
-        "tags":  [
-                     "error rate",
-                     "leading",
-                     "observability",
-                     "operational"
-                 ]
-    },
-    {
-        "id":  "40",
-        "type":  "software_metric",
-        "name":  "Saturation (Golden Signals, S in USE)",
-        "category":  "Operational",
-        "shortDescription":  "How \"full\" a resource is; backlog/queue depth.",
-        "measurement":  "Resource-specific pressure signals such as CPU run queue, connection-pool exhaustion, GC pressure, queue depth, or Kafka consumer lag.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Different resources have different saturation proxies.",
-        "tags":  [
-                     "leading",
-                     "operational",
-                     "resource pressure",
-                     "saturation"
-                 ]
-    },
-    {
-        "id":  "41",
-        "type":  "software_metric",
-        "name":  "Utilization (U in USE)",
-        "category":  "Operational",
-        "shortDescription":  "Fraction of time a resource is busy.",
-        "measurement":  "Host, container, or service-level metrics from tools such as top, vmstat, Prometheus node_exporter, or cloud monitoring systems.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Usually easy to collect, but interpretation depends on the resource type and the difference between busy time and saturation.",
-        "tags":  [
-                     "leading",
-                     "observability",
-                     "operational"
-                 ]
-    },
-    {
-        "id":  "42",
-        "type":  "software_metric",
-        "name":  "CPU / Memory Utilization",
-        "category":  "Operational",
-        "shortDescription":  "% of compute/memory consumed.",
-        "measurement":  "Host, VM, or container metrics from tools such as node_exporter, cAdvisor, CloudWatch, or eBPF-based monitors, usually broken down by CPU percentage and memory working set or RSS.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "but containerized memory (cache vs. RSS vs. working set) is nuanced.",
-        "tags":  [
-                     "capacity",
-                     "leading",
-                     "operational",
-                     "resource utilization"
-                 ]
-    },
-    {
-        "id":  "43",
-        "type":  "software_metric",
-        "name":  "Availability / Uptime",
-        "category":  "Operational",
-        "shortDescription":  "% of time service is up over a window.",
-        "measurement":  "Synthetic monitoring, uptime checks, or SLI-based calculations measuring the percentage of time a service is available over a reporting window.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "\"Up\" definition (does the synthetic probe match user experience?) is contestable.",
-        "tags":  [
-                     "availability",
-                     "lagging",
-                     "operational",
-                     "reliability",
-                     "sla"
-                 ]
-    },
-    {
-        "id":  "44",
-        "type":  "software_metric",
-        "name":  "Defect Density",
-        "category":  "Testing",
-        "shortDescription":  "Defects per KLOC or per module.",
-        "measurement":  "Bug tracker counts divided by KLOC, module size, or another chosen software-size denominator.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Bug-reporting practices vary; LOC denominator is noisy.",
-        "tags":  [
-                     "defects",
-                     "lagging",
-                     "quality trend",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "45",
-        "type":  "software_metric",
-        "name":  "Defect Escape Rate",
-        "category":  "Testing",
-        "shortDescription":  "% of defects that reach production vs. caught pre-prod.",
-        "measurement":  "defects_found_in_prod / (defects_found_in_prod + defects_found_pre_prod) over a release.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires consistent bug triage and time-window normalization.",
-        "tags":  [
-                     "defects",
-                     "lagging",
-                     "production quality",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "46",
-        "type":  "software_metric",
-        "name":  "Test Pass Rate",
-        "category":  "Testing",
-        "shortDescription":  "% of executed tests that pass.",
-        "measurement":  "CI test reports comparing passed tests with the total executed tests in a run or time window.",
-        "leadingLagging":  "Lagging",
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Can hide quality issues if flakes or skips are high.",
-        "tags":  [
-                     "ci/cd",
-                     "lagging",
-                     "test execution",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "47",
-        "type":  "software_metric",
-        "name":  "Mutation Score",
-        "category":  "Testing",
-        "shortDescription":  "% of injected code mutations that tests catch. Stronger signal than line coverage.",
-        "measurement":  "Mutation-testing tools such as Stryker, PIT, or Mutmut inject code changes and report the percentage of mutants that the test suite detects.",
-        "leadingLagging":  "Leading",
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Computationally expensive; integrating into CI is non-trivial.",
-        "tags":  [
-                     "hard",
-                     "mutation testing",
-                     "test quality",
-                     "testing"
-                 ]
-    },
-    {
-        "id":  "M1",
-        "type":  "meta_metric",
-        "name":  "Construct Validity",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric actually measures the conceptual attribute it claims to (e.g., does \"PR count\" measure \"productivity\"?).",
-        "measurement":  "Theoretical mapping of the construct to indicators, then convergent/discriminant validity tests against alternative measures. Triangulation; expert review (Ralph et al., 2022; Kaner \u0026 Bond, 2004).",
-        "leadingLagging":  null,
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Requires defining the construct precisely and finding independent measures; rarely done in industry dashboards.",
-        "tags":  [
-                     "construct validity",
-                     "measurement theory",
-                     "metric design",
-                     "validity"
-                 ]
-    },
-    {
-        "id":  "M2",
-        "type":  "meta_metric",
-        "name":  "Content Validity",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric covers the full breadth of the construct (e.g., does a code-quality score include security, maintainability, and performance?).",
-        "measurement":  "Domain-expert panel review; mapping metric components against a documented taxonomy such as ISO/IEC 25010 sub-characteristics.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Subjective but tractable through structured review.",
-        "tags":  [
-                     "content validity",
-                     "measurement theory",
-                     "quality model",
-                     "validity"
-                 ]
-    },
-    {
-        "id":  "M3",
-        "type":  "meta_metric",
-        "name":  "Criterion / Predictive Validity",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric predicts an external outcome of interest (e.g., does cyclomatic complexity predict defect rate?).",
-        "measurement":  "Correlation, regression, or causal-inference tests against the criterion variable on historical data.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Needs historical labeled data and care to avoid leakage.",
-        "tags":  [
-                     "predictive validity",
-                     "regression",
-                     "statistics",
-                     "validity"
-                 ]
-    },
-    {
-        "id":  "M4",
-        "type":  "meta_metric",
-        "name":  "Reliability (Repeatability)",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether re-measuring the same artifact under the same conditions yields the same value.",
-        "measurement":  "Test-retest, inter-rater agreement (for example Cohen\u0027s kappa or ICC) for human-judged metrics; deterministic re-runs for tool-based metrics.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Easy for deterministic tools, Hard for human-judgment metrics like \"code-review quality.\"",
-        "tags":  [
-                     "reliability",
-                     "repeatability",
-                     "statistics",
-                     "validity"
-                 ]
-    },
-    {
-        "id":  "M5",
-        "type":  "meta_metric",
-        "name":  "Stability / Variance over Time",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric drifts when the underlying system has not changed.",
-        "measurement":  "Statistical process control: rolling mean and standard deviation; flag if coefficient of variation \u003e threshold. Control charts (Shewhart, EWMA).",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires a stable baseline; seasonality complicates.",
-        "tags":  [
-                     "baseline",
-                     "stability",
-                     "time series",
-                     "variance"
-                 ]
-    },
-    {
-        "id":  "M6",
-        "type":  "meta_metric",
-        "name":  "Signal-to-Noise Ratio (SNR)",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether real change is larger than random fluctuation.",
-        "measurement":  "SNR = (mean change attributable to intervention) / (standard deviation of background noise). Power analysis to determine minimum detectable effect.",
-        "leadingLagging":  null,
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Requires controlled experimentation or interrupted-time-series; rare in operational metrics.",
-        "tags":  [
-                     "experimentation",
-                     "signal-to-noise",
-                     "statistics"
-                 ]
-    },
-    {
-        "id":  "M7",
-        "type":  "meta_metric",
-        "name":  "Sensitivity",
-        "category":  "Metric quality",
-        "shortDescription":  "How responsive the metric is to real changes in the underlying construct.",
-        "measurement":  "Apply a known stimulus (e.g., introduce a deliberate defect, slow a service) and observe metric delta; compute elasticity.",
-        "leadingLagging":  null,
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Requires fault injection or chaos engineering.",
-        "tags":  [
-                     "chaos engineering",
-                     "elasticity",
-                     "sensitivity"
-                 ]
-    },
-    {
-        "id":  "M8",
-        "type":  "meta_metric",
-        "name":  "Discriminative Power",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric can distinguish high-performing from low-performing units.",
-        "measurement":  "Compare metric distributions across known-different groups (e.g., teams classified independently as elite vs. baseline) using effect-size statistics (Cohen\u0027s d, AUC). Listed in IEEE Std 1061 / Schneidewind 1991.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires ground-truth labels.",
-        "tags":  [
-                     "benchmarking",
-                     "discrimination",
-                     "effect size",
-                     "metric quality"
-                 ]
-    },
-    {
-        "id":  "M9",
-        "type":  "meta_metric",
-        "name":  "Goodhart Susceptibility (\"Gameability\")",
-        "category":  "Metric quality",
-        "shortDescription":  "How easily the metric can be manipulated without delivering the underlying value.",
-        "measurement":  "Adversarial review: list the cheapest actions that would move the metric, and rate whether they correlate with the construct. Empirically: watch for sudden distributional shifts after the metric becomes a target. Goodhart-style typology (Manheim \u0026 Garrabrant): regressive, extremal, causal, adversarial.",
-        "leadingLagging":  null,
-        "difficulty":  "Hard",
-        "difficultyJustification":  "No standard quantitative method; depends on expert red-teaming.",
-        "tags":  [
-                     "gameability",
-                     "goodhart",
-                     "governance",
-                     "metric design"
-                 ]
-    },
-    {
-        "id":  "M10",
-        "type":  "meta_metric",
-        "name":  "Observer / Hawthorne Effect Magnitude",
-        "category":  "Metric quality",
-        "shortDescription":  "How much the act of measuring changes the behavior being measured.",
-        "measurement":  "Compare observed-versus-unobserved baselines; longitudinal decay analysis where novelty typically wears off in 1-4 weeks; subtle rollout designs such as concealed feature flags via Statsig.",
-        "leadingLagging":  null,
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Ethically and practically tricky; usually requires some period of concealed or minimally obtrusive measurement.",
-        "tags":  [
-                     "behavior change",
-                     "hawthorne effect",
-                     "measurement bias"
-                 ]
-    },
-    {
-        "id":  "M11",
-        "type":  "meta_metric",
-        "name":  "Bias in Collection",
-        "category":  "Metric quality",
-        "shortDescription":  "Systematic skew due to who or what is observed (e.g., LOC penalizes terse languages; coverage tools miss generated code; survey responders are not representative).",
-        "measurement":  "Tool-comparison studies; demographic / language / repo-segmented breakdowns to detect disparate measurement.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires multiple independent measurement instruments.",
-        "tags":  [
-                     "bias",
-                     "data collection",
-                     "sampling"
-                 ]
-    },
-    {
-        "id":  "M12",
-        "type":  "meta_metric",
-        "name":  "Correlation / Collinearity with Other Metrics",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric is redundant with existing ones.",
-        "measurement":  "Pearson/Spearman correlation matrix; Variance Inflation Factor (VIF) \u003e 5 indicates collinearity; Principal Component Analysis to find latent dimensions.",
-        "leadingLagging":  null,
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Standard statistical procedure once a metric inventory exists.",
-        "tags":  [
-                     "collinearity",
-                     "correlation",
-                     "statistics"
-                 ]
-    },
-    {
-        "id":  "M13",
-        "type":  "meta_metric",
-        "name":  "Coverage / Blind-Spot Score",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether important parts of the construct are unmeasured (the \"dark matter\" of metrics).",
-        "measurement":  "Map metrics onto a reference framework (SPACE dimensions, ISO/IEC 25010 categories, DORA velocity + stability, Four Golden Signals) and count gaps.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires an agreed framework.",
-        "tags":  [
-                     "blind spots",
-                     "coverage",
-                     "framework mapping"
-                 ]
-    },
-    {
-        "id":  "M14",
-        "type":  "meta_metric",
-        "name":  "Actionability",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether a change in the metric points to a clear, owned action.",
-        "measurement":  "For each metric ask: (a) is there a defined owner? (b) is there a documented intervention if it moves? (c) has the intervention been validated to move the metric? Score 0-3.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Subjective but easy to operationalize as a governance checklist.",
-        "tags":  [
-                     "actionability",
-                     "governance",
-                     "ownership"
-                 ]
-    },
-    {
-        "id":  "M15",
-        "type":  "meta_metric",
-        "name":  "Leading vs. Lagging Classification",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric reveals future outcomes or only confirms past ones; balanced programs need both.",
-        "measurement":  "Lag analysis: cross-correlation between the candidate metric and a known outcome metric at lag k; the metric is leading if peak correlation occurs at k \u003e 0.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Requires historical time-series and a defined outcome variable.",
-        "tags":  [
-                     "forecasting",
-                     "lagging indicator",
-                     "leading indicator"
-                 ]
-    },
-    {
-        "id":  "M16",
-        "type":  "meta_metric",
-        "name":  "Granularity / Aggregation Bias",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether averaging hides important variance (e.g., a 60-min mean MTTR may include 4-hour outliers and 5-min recoveries).",
-        "measurement":  "Report distributions, not just means. Compare mean, median, p90, p99; disaggregate to check for Simpson\u0027s paradox.",
-        "leadingLagging":  null,
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Modern tooling makes this easy to compute; routinely ignored in executive dashboards.",
-        "tags":  [
-                     "aggregation bias",
-                     "distribution",
-                     "percentiles"
-                 ]
-    },
-    {
-        "id":  "M17",
-        "type":  "meta_metric",
-        "name":  "Comparability / Cross-Team Validity",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric is meaningful when compared across teams, services, or organizations.",
-        "measurement":  "Define normalization (per-engineer? per-service? per-LOC?); evaluate context invariance via mixed-effects models.",
-        "leadingLagging":  null,
-        "difficulty":  "Hard",
-        "difficultyJustification":  "Most engineering metrics fail this test (lines of code being the canonical example).",
-        "tags":  [
-                     "benchmarking",
-                     "comparability",
-                     "normalization"
-                 ]
-    },
-    {
-        "id":  "M18",
-        "type":  "meta_metric",
-        "name":  "Cost of Measurement",
-        "category":  "Metric quality",
-        "shortDescription":  "Resources (compute, engineering time, intrusion) required to collect the metric.",
-        "measurement":  "Track instrumentation overhead (coverage instrumentation slows tests; APM sampling costs CPU); annotate metric inventory with a cost score.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Often forgotten until the data pipeline starts to break under its own weight.",
-        "tags":  [
-                     "cost",
-                     "instrumentation",
-                     "measurement overhead"
-                 ]
-    },
-    {
-        "id":  "M19",
-        "type":  "meta_metric",
-        "name":  "Timeliness / Latency to Insight",
-        "category":  "Metric quality",
-        "shortDescription":  "How fresh the metric is when it reaches a decision-maker.",
-        "measurement":  "time(decision) - time(event), measured as the delay between the underlying event and when the metric becomes available to a decision-maker.",
-        "leadingLagging":  null,
-        "difficulty":  "Easy",
-        "difficultyJustification":  "Often the difference between \"actionable\" and \"post-mortem only.\"",
-        "tags":  [
-                     "freshness",
-                     "latency",
-                     "metric delivery",
-                     "timeliness"
-                 ]
-    },
-    {
-        "id":  "M20",
-        "type":  "meta_metric",
-        "name":  "Monotonicity",
-        "category":  "Metric quality",
-        "shortDescription":  "Whether the metric behaves consistently when its underlying construct changes (for example, adding a complex method should never decrease module complexity - Weyuker 1988).",
-        "measurement":  "Algebraic check against Weyuker\u0027s properties; empirical perturbation tests.",
-        "leadingLagging":  null,
-        "difficulty":  "Medium",
-        "difficultyJustification":  "Well-defined for code metrics; less so for behavioral ones.",
-        "tags":  [
-                     "complexity",
-                     "monotonicity",
-                     "theory"
-                 ]
-    }
+  {
+    "id": "1",
+    "type": "software_metric",
+    "name": "Deployment Frequency (DF)",
+    "category": "DORA",
+    "shortDescription": "How often code is successfully released to production.",
+    "measurement": "Count of successful production deployment events per time window from CI/CD logs (GitHub Actions, GitLab, Jenkins, Spinnaker, Argo). DORA \"elite\" is approximately on-demand or multiple times per day.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Pure event count; main challenge is consistent definition of \"production\" and \"deployment.\"",
+    "tags": [
+      "ci/cd",
+      "dora",
+      "leading",
+      "observability",
+      "velocity"
+    ]
+  },
+  {
+    "id": "2",
+    "type": "software_metric",
+    "name": "Lead Time for Changes (LTC)",
+    "category": "DORA",
+    "shortDescription": "Time from code commit (or PR open) to that change running in production.",
+    "measurement": "timestamp(deploy) - timestamp(commit) aggregated as median or percentile. Computed by GitLab Value Stream Analytics, LinearB, DX, and Jellyfish.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires joining VCS + CI + deploy data; commit-time vs. PR-open-time choice changes the number materially.",
+    "tags": [
+      "ci/cd",
+      "dora",
+      "lagging",
+      "team productivity",
+      "velocity"
+    ]
+  },
+  {
+    "id": "3",
+    "type": "software_metric",
+    "name": "Change Failure Rate (CFR)",
+    "category": "DORA",
+    "shortDescription": "% of deployments that cause a production incident, rollback, or hotfix.",
+    "measurement": "failed_deployments / total_deployments. Requires linking incidents/rollbacks back to specific deployments.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Hard",
+    "difficultyJustification": "\"Failure\" definition varies (incident? rollback? hotfix within X hours?), and incident-to-deploy linkage is often manual.",
+    "tags": [
+      "ci/cd",
+      "dora",
+      "lagging",
+      "reliability",
+      "sre"
+    ]
+  },
+  {
+    "id": "4",
+    "type": "software_metric",
+    "name": "Mean Time to Restore/Recover (MTTR - DORA)",
+    "category": "DORA",
+    "shortDescription": "Average time from production incident start to service restored.",
+    "measurement": "sum(downtime) / number_of_incidents. Sourced from incident-management tools such as PagerDuty, Opsgenie, and ServiceNow. DORA elite is under 1 hour.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Skewed by outliers; depends on incident-start definition (alert fire vs. customer impact start). Median/p90 is often more honest than mean.",
+    "tags": [
+      "ci/cd",
+      "dora",
+      "lagging",
+      "reliability",
+      "sre"
+    ]
+  },
+  {
+    "id": "5",
+    "type": "software_metric",
+    "name": "Reliability (5th DORA metric)",
+    "category": "DORA",
+    "shortDescription": "Composite signal of whether services meet their reliability targets (SLOs) over time.",
+    "measurement": "Usually tracked as the share of service-level objectives met across services in a reporting window; some teams instead summarize weighted error-budget consumption.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires a mature SLO program; aggregation across services is subjective.",
+    "tags": [
+      "dora",
+      "lagging",
+      "reliability",
+      "slo",
+      "sre"
+    ]
+  },
+  {
+    "id": "6",
+    "type": "software_metric",
+    "name": "Cyclomatic Complexity (McCabe)",
+    "category": "Code quality",
+    "shortDescription": "Number of linearly independent paths through a function: 1 + number_of_conditional_branches.",
+    "measurement": "Static analysis: SonarQube, ESLint complexity rules, radon (Python), lizard, PMD. Computed per function and summed.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Deterministic and tool-supported; interpretation thresholds (>10 risky, >20 high-risk) vary by language.",
+    "tags": [
+      "code quality",
+      "leading",
+      "reliability",
+      "sre"
+    ]
+  },
+  {
+    "id": "7",
+    "type": "software_metric",
+    "name": "Cognitive Complexity",
+    "category": "Code quality",
+    "shortDescription": "How hard code is for a human to understand (penalizes nesting and breaks in linear flow).",
+    "measurement": "SonarSource's algorithm in SonarQube; differs from McCabe by weighting nested structures.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Tool support makes calculation straightforward; the metric itself is opinionated.",
+    "tags": [
+      "code quality",
+      "leading"
+    ]
+  },
+  {
+    "id": "8",
+    "type": "software_metric",
+    "name": "Code Coverage (line / statement / branch / condition)",
+    "category": "Testing",
+    "shortDescription": "% of code (lines, branches, or conditions) executed by tests.",
+    "measurement": "Coverage instrumentation: JaCoCo, Coverage.py, Istanbul/nyc, gcov, Codecov, Coveralls. Branch coverage stricter than line.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Calculation is straightforward, but interpreting the result correctly is difficult. 100% coverage does not imply correctness; it is necessary-but-not-sufficient.",
+    "tags": [
+      "leading",
+      "testing"
+    ]
+  },
+  {
+    "id": "9",
+    "type": "software_metric",
+    "name": "Technical Debt Ratio (SQALE)",
+    "category": "Code quality",
+    "shortDescription": "Ratio of estimated remediation cost to total development cost. SonarQube: remediation_cost / development_cost.",
+    "measurement": "SonarQube SQALE model assigns minutes per issue; development cost is approximated as LOC x cost_per_line.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Depends on rule set and remediation-effort estimates baked into the tool; cross-org comparisons are weak.",
+    "tags": [
+      "code quality",
+      "lagging",
+      "testing"
+    ]
+  },
+  {
+    "id": "10",
+    "type": "software_metric",
+    "name": "Code Duplication",
+    "category": "Code quality",
+    "shortDescription": "% of code that is duplicated (clone detection).",
+    "measurement": "SonarQube duplication detector, PMD CPD, jscpd. Reported as duplicated_lines / total_lines.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Tool-driven; threshold for \"duplicate\" (token count) is configurable.",
+    "tags": [
+      "code quality",
+      "leading"
+    ]
+  },
+  {
+    "id": "11",
+    "type": "software_metric",
+    "name": "Code Churn",
+    "category": "Code quality",
+    "shortDescription": "Lines added/changed/deleted over a window, often within N days of being written.",
+    "measurement": "Git log analysis; tools like CodeScene, GitPrime/Pluralsight Flow. High churn correlates with defect rate (Nagappan & Ball, MSR).",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Trivial to compute; interpreting \"good vs. bad\" churn requires baseline.",
+    "tags": [
+      "code quality",
+      "leading",
+      "risk"
+    ]
+  },
+  {
+    "id": "12",
+    "type": "software_metric",
+    "name": "Build Success Rate",
+    "category": "CI/CD",
+    "shortDescription": "% of CI builds passing on first attempt.",
+    "measurement": "successful_builds / total_builds from CI APIs such as Jenkins, GitHub Actions, Buildkite, and CircleCI. Elite teams often target >= 90% on the default branch.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Direct from CI logs; partition by branch (feature vs. main) for fair signal.",
+    "tags": [
+      "ci/cd",
+      "leading"
+    ]
+  },
+  {
+    "id": "13",
+    "type": "software_metric",
+    "name": "Pipeline Duration",
+    "category": "CI/CD",
+    "shortDescription": "Wall-clock time from pipeline trigger to completion.",
+    "measurement": "CI platform analytics measuring wall-clock time from pipeline trigger to final completion, typically tracked as median and p95 with queue time broken out separately.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Build/queue split aids diagnosis.",
+    "tags": [
+      "ci/cd",
+      "leading"
+    ]
+  },
+  {
+    "id": "14",
+    "type": "software_metric",
+    "name": "Queue Time",
+    "category": "CI/CD",
+    "shortDescription": "Time builds wait before an executor picks them up.",
+    "measurement": "CI scheduler timestamps, usually captured directly from Jenkins, GitHub Actions, Buildkite, or similar CI platforms.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Some CI tools expose it natively; others require log scraping.",
+    "tags": [
+      "ci/cd",
+      "executor capacity",
+      "leading",
+      "pipeline performance"
+    ]
+  },
+  {
+    "id": "15",
+    "type": "software_metric",
+    "name": "Flaky Test Rate",
+    "category": "Testing",
+    "shortDescription": "% of tests that have failed and then passed without code change in a window.",
+    "measurement": "Cross-reference test-run history with git diffs; tools: Buildkite Test Analytics, CircleCI Test Insights, Atlassian Flakinator, Datadog CI Visibility. Empirically, Google reports ~16% of test failures are flaky; Microsoft ~13%.",
+    "leadingLagging": "Leading",
+    "difficulty": "Hard",
+    "difficultyJustification": "Requires correlating runs to code state; many CIs do not natively distinguish flake from real failure.",
+    "tags": [
+      "ci/cd",
+      "flakiness",
+      "leading",
+      "testing"
+    ]
+  },
+  {
+    "id": "16",
+    "type": "software_metric",
+    "name": "Mean Time to Green (MTTG)",
+    "category": "CI/CD",
+    "shortDescription": "Time from PR open until CI is green.",
+    "measurement": "Join pull request timestamps with CI run results to measure time from PR open until the default required checks are green.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Depends on flake handling and rerun policies.",
+    "tags": [
+      "ci/cd",
+      "leading",
+      "pull request",
+      "team productivity"
+    ]
+  },
+  {
+    "id": "17",
+    "type": "software_metric",
+    "name": "Vulnerability Density",
+    "category": "Security",
+    "shortDescription": "Open vulnerabilities per asset (or per KLOC).",
+    "measurement": "Counts from SCA/SAST/DAST scanners (Snyk, Dependabot, Tenable, Qualys, Wiz) divided by inventory.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Sensitive to scanner coverage and CVE deduplication; not comparable across tools.",
+    "tags": [
+      "lagging",
+      "security"
+    ]
+  },
+  {
+    "id": "18",
+    "type": "software_metric",
+    "name": "MTTR for CVEs / Mean Time to Remediate",
+    "category": "Security",
+    "shortDescription": "Average time from vulnerability detection to verified fix.",
+    "measurement": "sum(close_time - detect_time) / count, sliced by severity. Edgescan's 2023 report puts industry-wide critical MTTR at approximately 65 days.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Detection timestamp varies by source (scan run vs. CVE disclosure).",
+    "tags": [
+      "lagging",
+      "remediation",
+      "security",
+      "vulnerability management"
+    ]
+  },
+  {
+    "id": "19",
+    "type": "software_metric",
+    "name": "Mean Time to Patch (MTTP) / Patch Lag",
+    "category": "Security",
+    "shortDescription": "Gap between vendor patch release and deployment in the environment.",
+    "measurement": "Patch-deploy timestamp minus vendor-release timestamp; tracked in patch-management tools (WSUS, Tanium, JAMF).",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires authoritative inventory and vendor patch metadata.",
+    "tags": [
+      "lagging",
+      "patch management",
+      "security"
+    ]
+  },
+  {
+    "id": "20",
+    "type": "software_metric",
+    "name": "Patch Compliance Rate",
+    "category": "Security",
+    "shortDescription": "% of in-scope assets within patch-SLA.",
+    "measurement": "Asset-level patch compliance states aggregated by severity tier, business unit, or environment against a defined remediation SLA.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Asset inventory completeness is usually the bottleneck.",
+    "tags": [
+      "lagging",
+      "patch management",
+      "security",
+      "sla"
+    ]
+  },
+  {
+    "id": "21",
+    "type": "software_metric",
+    "name": "Scanner / Inventory Coverage",
+    "category": "Security",
+    "shortDescription": "% of assets actually scanned within the last cycle.",
+    "measurement": "(asset inventory intersection scanned assets) / asset inventory, usually measured per scan cycle to show how much of the known environment is actually being assessed.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Shadow IT and ephemeral cloud assets degrade accuracy.",
+    "tags": [
+      "asset inventory",
+      "leading",
+      "scanner coverage",
+      "security"
+    ]
+  },
+  {
+    "id": "22",
+    "type": "software_metric",
+    "name": "MTTF (Mean Time To Failure)",
+    "category": "SRE",
+    "shortDescription": "Average operational time before a non-repairable component fails.",
+    "measurement": "total_operational_time / number_of_failures. Used for hardware-style or replaceable components.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Hard",
+    "difficultyJustification": "Hard for software (often poorly defined; software is typically repairable, so MTBF is more appropriate).",
+    "tags": [
+      "lagging",
+      "sre"
+    ]
+  },
+  {
+    "id": "23",
+    "type": "software_metric",
+    "name": "MTBF (Mean Time Between Failures)",
+    "category": "SRE",
+    "shortDescription": "Average uptime between failures for repairable systems.",
+    "measurement": "MTTF + MTTR or total_uptime / number_of_failures. Availability = MTBF / (MTBF + MTTR).",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Easily gamed by raising the threshold of what counts as an incident.",
+    "tags": [
+      "lagging",
+      "operational",
+      "reliability",
+      "sre"
+    ]
+  },
+  {
+    "id": "24",
+    "type": "software_metric",
+    "name": "MTTD (Mean Time to Detect)",
+    "category": "SRE",
+    "shortDescription": "Time from failure onset until monitoring/team becomes aware.",
+    "measurement": "sum(alert_time - failure_start_time) / count. Needs ground truth on when failure actually began, often from forensic log review rather than alerts.",
+    "leadingLagging": "Leading",
+    "difficulty": "Hard",
+    "difficultyJustification": "True failure-start is rarely known precisely; many teams understate MTTD by using alert-fire as start.",
+    "tags": [
+      "leading",
+      "sre",
+      "team productivity"
+    ]
+  },
+  {
+    "id": "25",
+    "type": "software_metric",
+    "name": "MTTA (Mean Time to Acknowledge)",
+    "category": "SRE",
+    "shortDescription": "Time from alert page to human acknowledgement.",
+    "measurement": "PagerDuty, Opsgenie, or similar incident-management analytics comparing page time with acknowledgement time.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Direct from incident tool.",
+    "tags": [
+      "incident response",
+      "leading",
+      "pager",
+      "sre"
+    ]
+  },
+  {
+    "id": "26",
+    "type": "software_metric",
+    "name": "SLI (Service Level Indicator)",
+    "category": "SRE",
+    "shortDescription": "Quantitative measure of service behavior, e.g., good_requests / total_requests, p99 latency.",
+    "measurement": "Computed from logs, metrics (Prometheus, Datadog, New Relic), or synthetic checks.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Choosing \"good event\" predicates and request scopes is the hard part.",
+    "tags": [
+      "leading",
+      "observability",
+      "operational",
+      "reliability",
+      "sre"
+    ]
+  },
+  {
+    "id": "27",
+    "type": "software_metric",
+    "name": "SLO Compliance",
+    "category": "SRE",
+    "shortDescription": "% of measurement window in which SLI met its objective.",
+    "measurement": "Burn-rate calculation against an SLO target (e.g., 99.9%). Tools: Sloth, Nobl9, Datadog SLO, Grafana SLO.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Definition of valid traffic and exclusions (planned maintenance) is contentious.",
+    "tags": [
+      "lagging",
+      "observability",
+      "reliability",
+      "security",
+      "sre"
+    ]
+  },
+  {
+    "id": "28",
+    "type": "software_metric",
+    "name": "Error Budget",
+    "category": "SRE",
+    "shortDescription": "Allowed unreliability per window = 1 - SLO. For 99.9% over 30 days, that is approximately 43 minutes.",
+    "measurement": "Derived from the SLO as 1 - target reliability, then tracked through burn-rate alerts and cumulative consumption over the reporting window.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Easy formula, but operational use requires organizational buy-in.",
+    "tags": [
+      "error budget",
+      "leading",
+      "reliability",
+      "slo",
+      "sre"
+    ]
+  },
+  {
+    "id": "29",
+    "type": "software_metric",
+    "name": "Toil Fraction",
+    "category": "SRE",
+    "shortDescription": "% of engineer time spent on manual, repetitive ops work.",
+    "measurement": "Self-reported time tracking, ticket tagging, or calendar analysis estimating the share of engineer time spent on repetitive operational work. The Google SRE book suggests keeping this below 50%.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Hard",
+    "difficultyJustification": "Almost entirely self-reported; subject to recall and definition bias.",
+    "tags": [
+      "lagging",
+      "manual work",
+      "sre",
+      "toil"
+    ]
+  },
+  {
+    "id": "30",
+    "type": "software_metric",
+    "name": "PR Cycle Time",
+    "category": "Team productivity",
+    "shortDescription": "End-to-end time from PR opened to merged (sometimes to deploy).",
+    "measurement": "Git host APIs or engineering analytics tools measuring elapsed time from PR creation to merge, and sometimes onward to deployment.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Sensitive to draft-PR practices and squash-merge conventions.",
+    "tags": [
+      "cycle time",
+      "leading",
+      "pull request",
+      "team productivity",
+      "velocity"
+    ]
+  },
+  {
+    "id": "31",
+    "type": "software_metric",
+    "name": "PR Review Turnaround / Pickup Time",
+    "category": "Team productivity",
+    "shortDescription": "Hours from PR opened to first substantive review.",
+    "measurement": "Git host webhook or API timestamps comparing PR creation time with the first substantive review event.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Often the largest hidden contributor to cycle time.",
+    "tags": [
+      "code review",
+      "leading",
+      "pull request",
+      "team productivity"
+    ]
+  },
+  {
+    "id": "32",
+    "type": "software_metric",
+    "name": "PR Size",
+    "category": "Team productivity",
+    "shortDescription": "Lines or files changed per PR.",
+    "measurement": "Git diff statistics such as lines changed or files touched per PR, often analyzed against review speed, merge time, or downstream defect rates.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "LOC is noisy across languages.",
+    "tags": [
+      "code review",
+      "leading",
+      "pull request",
+      "team productivity"
+    ]
+  },
+  {
+    "id": "33",
+    "type": "software_metric",
+    "name": "Throughput",
+    "category": "Team productivity",
+    "shortDescription": "Issues, stories, or PRs completed per unit time.",
+    "measurement": "Counts of issues, stories, tickets, or PRs completed per time window using sources such as Jira, Linear, or GitHub Projects.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Easy to count, Hard to interpret (story points are subjective).",
+    "tags": [
+      "delivery",
+      "lagging",
+      "team productivity",
+      "throughput",
+      "velocity"
+    ]
+  },
+  {
+    "id": "34",
+    "type": "software_metric",
+    "name": "Work in Progress (WIP)",
+    "category": "Team productivity",
+    "shortDescription": "Items concurrently in-flight per team or person.",
+    "measurement": "Pulled from the issue tracker. Little's Law: WIP = throughput x cycle_time.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Definition of \"in progress\" status must be agreed.",
+    "tags": [
+      "flow",
+      "leading",
+      "team productivity",
+      "throughput",
+      "wip"
+    ]
+  },
+  {
+    "id": "35",
+    "type": "software_metric",
+    "name": "Rework Rate",
+    "category": "Team productivity",
+    "shortDescription": "% of code changed within N days of being merged.",
+    "measurement": "Git churn analysis identifying the percentage of code that is modified again within a chosen window after merge, often using tools such as CodeScene or GitPrime.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Window choice matters; legitimate iteration looks like rework.",
+    "tags": [
+      "code churn",
+      "lagging",
+      "rework",
+      "team productivity"
+    ]
+  },
+  {
+    "id": "36",
+    "type": "software_metric",
+    "name": "Sprint Goal Completion Rate",
+    "category": "Team productivity",
+    "shortDescription": "% of committed sprint scope delivered.",
+    "measurement": "Jira, Linear, or similar sprint reports comparing committed scope with completed scope at sprint end.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Easy",
+    "difficultyJustification": "Straightforward to compute, but teams can game it by under-committing or redefining scope mid-sprint.",
+    "tags": [
+      "agile",
+      "lagging",
+      "planning",
+      "team productivity"
+    ]
+  },
+  {
+    "id": "37",
+    "type": "software_metric",
+    "name": "Latency (request)",
+    "category": "Operational",
+    "shortDescription": "Time from request to response, usually as p50/p95/p99 distribution.",
+    "measurement": "Latency distributions from APM or observability systems such as Prometheus histograms, Datadog, or OpenTelemetry, usually reported as p50, p95, and p99.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "The long tail (p99) is the meaningful number.",
+    "tags": [
+      "latency",
+      "leading",
+      "observability",
+      "operational"
+    ]
+  },
+  {
+    "id": "38",
+    "type": "software_metric",
+    "name": "Traffic / Request Rate (R in RED, Traffic Golden Signal)",
+    "category": "Operational",
+    "shortDescription": "Requests per second served.",
+    "measurement": "APM or observability counter metrics, usually expressed as requests per second over time.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Simple counter-based metric, though teams still need to define which requests count toward the total.",
+    "tags": [
+      "leading",
+      "observability",
+      "operational"
+    ]
+  },
+  {
+    "id": "39",
+    "type": "software_metric",
+    "name": "Error Rate (E in RED, Errors Golden Signal)",
+    "category": "Operational",
+    "shortDescription": "Failed requests / total requests.",
+    "measurement": "Error counters from logs or metrics, usually calculated as failed requests divided by total requests, with 5xx responses, timeouts, and uncaught exceptions included.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Definition of \"error\" needs care (4xx often excluded).",
+    "tags": [
+      "error rate",
+      "leading",
+      "observability",
+      "operational"
+    ]
+  },
+  {
+    "id": "40",
+    "type": "software_metric",
+    "name": "Saturation (Golden Signals, S in USE)",
+    "category": "Operational",
+    "shortDescription": "How \"full\" a resource is; backlog/queue depth.",
+    "measurement": "Resource-specific pressure signals such as CPU run queue, connection-pool exhaustion, GC pressure, queue depth, or Kafka consumer lag.",
+    "leadingLagging": "Leading",
+    "difficulty": "Medium",
+    "difficultyJustification": "Different resources have different saturation proxies.",
+    "tags": [
+      "leading",
+      "operational",
+      "resource utilization",
+      "saturation"
+    ]
+  },
+  {
+    "id": "41",
+    "type": "software_metric",
+    "name": "Utilization (U in USE)",
+    "category": "Operational",
+    "shortDescription": "Fraction of time a resource is busy.",
+    "measurement": "Host, container, or service-level metrics from tools such as top, vmstat, Prometheus node_exporter, or cloud monitoring systems.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "Usually easy to collect, but interpretation depends on the resource type and the difference between busy time and saturation.",
+    "tags": [
+      "leading",
+      "observability",
+      "operational"
+    ]
+  },
+  {
+    "id": "42",
+    "type": "software_metric",
+    "name": "CPU / Memory Utilization",
+    "category": "Operational",
+    "shortDescription": "% of compute/memory consumed.",
+    "measurement": "Host, VM, or container metrics from tools such as node_exporter, cAdvisor, CloudWatch, or eBPF-based monitors, usually broken down by CPU percentage and memory working set or RSS.",
+    "leadingLagging": "Leading",
+    "difficulty": "Easy",
+    "difficultyJustification": "but containerized memory (cache vs. RSS vs. working set) is nuanced.",
+    "tags": [
+      "capacity",
+      "leading",
+      "operational",
+      "resource utilization"
+    ]
+  },
+  {
+    "id": "43",
+    "type": "software_metric",
+    "name": "Availability / Uptime",
+    "category": "Operational",
+    "shortDescription": "% of time service is up over a window.",
+    "measurement": "Synthetic monitoring, uptime checks, or SLI-based calculations measuring the percentage of time a service is available over a reporting window.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "\"Up\" definition (does the synthetic probe match user experience?) is contestable.",
+    "tags": [
+      "availability",
+      "lagging",
+      "operational",
+      "reliability",
+      "sla"
+    ]
+  },
+  {
+    "id": "44",
+    "type": "software_metric",
+    "name": "Defect Density",
+    "category": "Testing",
+    "shortDescription": "Defects per KLOC or per module.",
+    "measurement": "Bug tracker counts divided by KLOC, module size, or another chosen software-size denominator.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Bug-reporting practices vary; LOC denominator is noisy.",
+    "tags": [
+      "defects",
+      "lagging",
+      "code quality",
+      "testing"
+    ]
+  },
+  {
+    "id": "45",
+    "type": "software_metric",
+    "name": "Defect Escape Rate",
+    "category": "Testing",
+    "shortDescription": "% of defects that reach production vs. caught pre-prod.",
+    "measurement": "defects_found_in_prod / (defects_found_in_prod + defects_found_pre_prod) over a release.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires consistent bug triage and time-window normalization.",
+    "tags": [
+      "defects",
+      "lagging",
+      "code quality",
+      "testing"
+    ]
+  },
+  {
+    "id": "46",
+    "type": "software_metric",
+    "name": "Test Pass Rate",
+    "category": "Testing",
+    "shortDescription": "% of executed tests that pass.",
+    "measurement": "CI test reports comparing passed tests with the total executed tests in a run or time window.",
+    "leadingLagging": "Lagging",
+    "difficulty": "Easy",
+    "difficultyJustification": "Can hide quality issues if flakes or skips are high.",
+    "tags": [
+      "ci/cd",
+      "lagging",
+      "testing"
+    ]
+  },
+  {
+    "id": "47",
+    "type": "software_metric",
+    "name": "Mutation Score",
+    "category": "Testing",
+    "shortDescription": "% of injected code mutations that tests catch. Stronger signal than line coverage.",
+    "measurement": "Mutation-testing tools such as Stryker, PIT, or Mutmut inject code changes and report the percentage of mutants that the test suite detects.",
+    "leadingLagging": "Leading",
+    "difficulty": "Hard",
+    "difficultyJustification": "Computationally expensive; integrating into CI is non-trivial.",
+    "tags": [
+      "hard",
+      "mutation testing",
+      "testing"
+    ]
+  },
+  {
+    "id": "M1",
+    "type": "meta_metric",
+    "name": "Construct Validity",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric actually measures the conceptual attribute it claims to (e.g., does \"PR count\" measure \"productivity\"?).",
+    "measurement": "Theoretical mapping of the construct to indicators, then convergent/discriminant validity tests against alternative measures. Triangulation; expert review (Ralph et al., 2022; Kaner & Bond, 2004).",
+    "leadingLagging": null,
+    "difficulty": "Hard",
+    "difficultyJustification": "Requires defining the construct precisely and finding independent measures; rarely done in industry dashboards.",
+    "tags": [
+      "construct validity",
+      "measurement theory",
+      "metric design",
+      "validity"
+    ]
+  },
+  {
+    "id": "M2",
+    "type": "meta_metric",
+    "name": "Content Validity",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric covers the full breadth of the construct (e.g., does a code-quality score include security, maintainability, and performance?).",
+    "measurement": "Domain-expert panel review; mapping metric components against a documented taxonomy such as ISO/IEC 25010 sub-characteristics.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Subjective but tractable through structured review.",
+    "tags": [
+      "content validity",
+      "measurement theory",
+      "quality model",
+      "validity"
+    ]
+  },
+  {
+    "id": "M3",
+    "type": "meta_metric",
+    "name": "Criterion / Predictive Validity",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric predicts an external outcome of interest (e.g., does cyclomatic complexity predict defect rate?).",
+    "measurement": "Correlation, regression, or causal-inference tests against the criterion variable on historical data.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Needs historical labeled data and care to avoid leakage.",
+    "tags": [
+      "predictive validity",
+      "regression",
+      "statistics",
+      "validity"
+    ]
+  },
+  {
+    "id": "M4",
+    "type": "meta_metric",
+    "name": "Reliability (Repeatability)",
+    "category": "Metric quality",
+    "shortDescription": "Whether re-measuring the same artifact under the same conditions yields the same value.",
+    "measurement": "Test-retest, inter-rater agreement (for example Cohen's kappa or ICC) for human-judged metrics; deterministic re-runs for tool-based metrics.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Easy for deterministic tools, Hard for human-judgment metrics like \"code-review quality.\"",
+    "tags": [
+      "reliability",
+      "repeatability",
+      "statistics",
+      "validity"
+    ]
+  },
+  {
+    "id": "M5",
+    "type": "meta_metric",
+    "name": "Stability / Variance over Time",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric drifts when the underlying system has not changed.",
+    "measurement": "Statistical process control: rolling mean and standard deviation; flag if coefficient of variation > threshold. Control charts (Shewhart, EWMA).",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires a stable baseline; seasonality complicates.",
+    "tags": [
+      "baseline",
+      "stability",
+      "time series",
+      "variance"
+    ]
+  },
+  {
+    "id": "M6",
+    "type": "meta_metric",
+    "name": "Signal-to-Noise Ratio (SNR)",
+    "category": "Metric quality",
+    "shortDescription": "Whether real change is larger than random fluctuation.",
+    "measurement": "SNR = (mean change attributable to intervention) / (standard deviation of background noise). Power analysis to determine minimum detectable effect.",
+    "leadingLagging": null,
+    "difficulty": "Hard",
+    "difficultyJustification": "Requires controlled experimentation or interrupted-time-series; rare in operational metrics.",
+    "tags": [
+      "experimentation",
+      "signal-to-noise",
+      "statistics"
+    ]
+  },
+  {
+    "id": "M7",
+    "type": "meta_metric",
+    "name": "Sensitivity",
+    "category": "Metric quality",
+    "shortDescription": "How responsive the metric is to real changes in the underlying construct.",
+    "measurement": "Apply a known stimulus (e.g., introduce a deliberate defect, slow a service) and observe metric delta; compute elasticity.",
+    "leadingLagging": null,
+    "difficulty": "Hard",
+    "difficultyJustification": "Requires fault injection or chaos engineering.",
+    "tags": [
+      "chaos engineering",
+      "elasticity",
+      "sensitivity"
+    ]
+  },
+  {
+    "id": "M8",
+    "type": "meta_metric",
+    "name": "Discriminative Power",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric can distinguish high-performing from low-performing units.",
+    "measurement": "Compare metric distributions across known-different groups (e.g., teams classified independently as elite vs. baseline) using effect-size statistics (Cohen's d, AUC). Listed in IEEE Std 1061 / Schneidewind 1991.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires ground-truth labels.",
+    "tags": [
+      "benchmarking",
+      "discrimination",
+      "effect size",
+      "metric quality"
+    ]
+  },
+  {
+    "id": "M9",
+    "type": "meta_metric",
+    "name": "Goodhart Susceptibility (\"Gameability\")",
+    "category": "Metric quality",
+    "shortDescription": "How easily the metric can be manipulated without delivering the underlying value.",
+    "measurement": "Adversarial review: list the cheapest actions that would move the metric, and rate whether they correlate with the construct. Empirically: watch for sudden distributional shifts after the metric becomes a target. Goodhart-style typology (Manheim & Garrabrant): regressive, extremal, causal, adversarial.",
+    "leadingLagging": null,
+    "difficulty": "Hard",
+    "difficultyJustification": "No standard quantitative method; depends on expert red-teaming.",
+    "tags": [
+      "gameability",
+      "goodhart",
+      "governance",
+      "metric design"
+    ]
+  },
+  {
+    "id": "M10",
+    "type": "meta_metric",
+    "name": "Observer / Hawthorne Effect Magnitude",
+    "category": "Metric quality",
+    "shortDescription": "How much the act of measuring changes the behavior being measured.",
+    "measurement": "Compare observed-versus-unobserved baselines; longitudinal decay analysis where novelty typically wears off in 1-4 weeks; subtle rollout designs such as concealed feature flags via Statsig.",
+    "leadingLagging": null,
+    "difficulty": "Hard",
+    "difficultyJustification": "Ethically and practically tricky; usually requires some period of concealed or minimally obtrusive measurement.",
+    "tags": [
+      "behavior change",
+      "hawthorne effect",
+      "measurement bias"
+    ]
+  },
+  {
+    "id": "M11",
+    "type": "meta_metric",
+    "name": "Bias in Collection",
+    "category": "Metric quality",
+    "shortDescription": "Systematic skew due to who or what is observed (e.g., LOC penalizes terse languages; coverage tools miss generated code; survey responders are not representative).",
+    "measurement": "Tool-comparison studies; demographic / language / repo-segmented breakdowns to detect disparate measurement.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires multiple independent measurement instruments.",
+    "tags": [
+      "bias",
+      "data collection",
+      "sampling"
+    ]
+  },
+  {
+    "id": "M12",
+    "type": "meta_metric",
+    "name": "Correlation / Collinearity with Other Metrics",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric is redundant with existing ones.",
+    "measurement": "Pearson/Spearman correlation matrix; Variance Inflation Factor (VIF) > 5 indicates collinearity; Principal Component Analysis to find latent dimensions.",
+    "leadingLagging": null,
+    "difficulty": "Easy",
+    "difficultyJustification": "Standard statistical procedure once a metric inventory exists.",
+    "tags": [
+      "collinearity",
+      "correlation",
+      "statistics"
+    ]
+  },
+  {
+    "id": "M13",
+    "type": "meta_metric",
+    "name": "Coverage / Blind-Spot Score",
+    "category": "Metric quality",
+    "shortDescription": "Whether important parts of the construct are unmeasured (the \"dark matter\" of metrics).",
+    "measurement": "Map metrics onto a reference framework (SPACE dimensions, ISO/IEC 25010 categories, DORA velocity + stability, Four Golden Signals) and count gaps.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires an agreed framework.",
+    "tags": [
+      "blind spots",
+      "coverage",
+      "framework mapping"
+    ]
+  },
+  {
+    "id": "M14",
+    "type": "meta_metric",
+    "name": "Actionability",
+    "category": "Metric quality",
+    "shortDescription": "Whether a change in the metric points to a clear, owned action.",
+    "measurement": "For each metric ask: (a) is there a defined owner? (b) is there a documented intervention if it moves? (c) has the intervention been validated to move the metric? Score 0-3.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Subjective but easy to operationalize as a governance checklist.",
+    "tags": [
+      "actionability",
+      "governance",
+      "ownership"
+    ]
+  },
+  {
+    "id": "M15",
+    "type": "meta_metric",
+    "name": "Leading vs. Lagging Classification",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric reveals future outcomes or only confirms past ones; balanced programs need both.",
+    "measurement": "Lag analysis: cross-correlation between the candidate metric and a known outcome metric at lag k; the metric is leading if peak correlation occurs at k > 0.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Requires historical time-series and a defined outcome variable.",
+    "tags": [
+      "forecasting",
+      "lagging",
+      "leading"
+    ]
+  },
+  {
+    "id": "M16",
+    "type": "meta_metric",
+    "name": "Granularity / Aggregation Bias",
+    "category": "Metric quality",
+    "shortDescription": "Whether averaging hides important variance (e.g., a 60-min mean MTTR may include 4-hour outliers and 5-min recoveries).",
+    "measurement": "Report distributions, not just means. Compare mean, median, p90, p99; disaggregate to check for Simpson's paradox.",
+    "leadingLagging": null,
+    "difficulty": "Easy",
+    "difficultyJustification": "Modern tooling makes this easy to compute; routinely ignored in executive dashboards.",
+    "tags": [
+      "aggregation bias",
+      "distribution",
+      "percentiles"
+    ]
+  },
+  {
+    "id": "M17",
+    "type": "meta_metric",
+    "name": "Comparability / Cross-Team Validity",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric is meaningful when compared across teams, services, or organizations.",
+    "measurement": "Define normalization (per-engineer? per-service? per-LOC?); evaluate context invariance via mixed-effects models.",
+    "leadingLagging": null,
+    "difficulty": "Hard",
+    "difficultyJustification": "Most engineering metrics fail this test (lines of code being the canonical example).",
+    "tags": [
+      "benchmarking",
+      "comparability",
+      "normalization"
+    ]
+  },
+  {
+    "id": "M18",
+    "type": "meta_metric",
+    "name": "Cost of Measurement",
+    "category": "Metric quality",
+    "shortDescription": "Resources (compute, engineering time, intrusion) required to collect the metric.",
+    "measurement": "Track instrumentation overhead (coverage instrumentation slows tests; APM sampling costs CPU); annotate metric inventory with a cost score.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Often forgotten until the data pipeline starts to break under its own weight.",
+    "tags": [
+      "cost",
+      "instrumentation",
+      "measurement overhead"
+    ]
+  },
+  {
+    "id": "M19",
+    "type": "meta_metric",
+    "name": "Timeliness / Latency to Insight",
+    "category": "Metric quality",
+    "shortDescription": "How fresh the metric is when it reaches a decision-maker.",
+    "measurement": "time(decision) - time(event), measured as the delay between the underlying event and when the metric becomes available to a decision-maker.",
+    "leadingLagging": null,
+    "difficulty": "Easy",
+    "difficultyJustification": "Often the difference between \"actionable\" and \"post-mortem only.\"",
+    "tags": [
+      "latency"
+    ]
+  },
+  {
+    "id": "M20",
+    "type": "meta_metric",
+    "name": "Monotonicity",
+    "category": "Metric quality",
+    "shortDescription": "Whether the metric behaves consistently when its underlying construct changes (for example, adding a complex method should never decrease module complexity - Weyuker 1988).",
+    "measurement": "Algebraic check against Weyuker's properties; empirical perturbation tests.",
+    "leadingLagging": null,
+    "difficulty": "Medium",
+    "difficultyJustification": "Well-defined for code metrics; less so for behavioral ones.",
+    "tags": [
+      "complexity",
+      "monotonicity",
+      "theory"
+    ]
+  }
 ]

@@ -264,7 +264,7 @@
     "id": "tool-19",
     "name": "vulture",
     "language": "Python",
-    "category": "Dead code",
+    "category": "Static analysis",
     "relatedMetricIds": [],
     "metrics": [
       "unused functions",
@@ -283,7 +283,7 @@
       "10"
     ],
     "metrics": [
-      "duplicate code blocks",
+      "code duplication",
       "similar lines count",
       "clone pairs"
     ]
@@ -301,9 +301,9 @@
       "17"
     ],
     "metrics": [
-      "bugs",
-      "vulnerabilities",
-      "duplication",
+      "bug detection",
+      "security issues",
+      "code duplication",
       "maintainability",
       "cognitive complexity"
     ]
@@ -318,7 +318,7 @@
     ],
     "metrics": [
       "possible problems",
-      "style rule violations",
+      "style",
       "unused variables",
       "fixable rule violations"
     ]
@@ -330,7 +330,7 @@
     "category": "Formatter",
     "relatedMetricIds": [],
     "metrics": [
-      "formatting consistency"
+      "formatting"
     ]
   },
   {
@@ -340,7 +340,7 @@
     "category": "Style & errors",
     "relatedMetricIds": [],
     "metrics": [
-      "naming conventions",
+      "naming",
       "formatting",
       "imports",
       "documentation rules"
@@ -356,10 +356,10 @@
       "10"
     ],
     "metrics": [
-      "duplication",
+      "code duplication",
       "dead code",
       "complexity",
-      "naming issues"
+      "naming"
     ]
   },
   {
@@ -369,7 +369,7 @@
     "category": "Static analysis",
     "relatedMetricIds": [],
     "metrics": [
-      "bug patterns",
+      "bug detection",
       "null pointers",
       "concurrency issues"
     ]
@@ -383,7 +383,7 @@
       "17"
     ],
     "metrics": [
-      "vulnerabilities",
+      "security issues",
       "patterns",
       "insecure code"
     ]
@@ -397,8 +397,8 @@
       "17"
     ],
     "metrics": [
-      "source code vulnerabilities",
-      "SAST findings",
+      "security issues",
+      "static analysis",
       "security dataflow issues"
     ]
   },
@@ -422,7 +422,7 @@
     "id": "tool-30",
     "name": "Code Climate Quality / Qlty Cloud",
     "language": "Multi-language",
-    "category": "Maintainability",
+    "category": "Code quality",
     "relatedMetricIds": [
       "6",
       "9",
@@ -430,7 +430,7 @@
     ],
     "metrics": [
       "complexity",
-      "duplication",
+      "code duplication",
       "maintainability"
     ]
   },
@@ -445,7 +445,7 @@
     "metrics": [
       "code quality",
       "anti-patterns",
-      "security"
+      "security issues"
     ]
   },
   {
@@ -495,7 +495,7 @@
     "metrics": [
       "style",
       "formatting",
-      "naming conventions"
+      "naming"
     ]
   },
   {
@@ -518,7 +518,7 @@
     "relatedMetricIds": [],
     "metrics": [
       "type safety",
-      "bugs",
+      "bug detection",
       "maintainability"
     ]
   },
@@ -557,7 +557,7 @@
     ],
     "metrics": [
       "complexity",
-      "smells",
+      "code smells",
       "readability"
     ]
   },
@@ -568,7 +568,7 @@
     "category": "Style & errors",
     "relatedMetricIds": [],
     "metrics": [
-      "style rules",
+      "style",
       "naming",
       "formatting"
     ]
@@ -619,7 +619,7 @@
       "17"
     ],
     "metrics": [
-      "security",
+      "security issues",
       "query-based analysis"
     ]
   },
@@ -627,7 +627,7 @@
     "id": "tool-46",
     "name": "Understand",
     "language": "Multi-language",
-    "category": "Architecture",
+    "category": "Architecture & comprehension",
     "relatedMetricIds": [],
     "metrics": [
       "dependency analysis",
@@ -667,7 +667,7 @@
       "8"
     ],
     "metrics": [
-      "coverage metrics"
+      "code coverage"
     ]
   },
   {
@@ -748,7 +748,7 @@
     "metrics": [
       "complexity",
       "maintainability",
-      "documentation"
+      "documentation quality"
     ]
   },
   {
@@ -758,7 +758,7 @@
     "category": "Formatter",
     "relatedMetricIds": [],
     "metrics": [
-      "formatting consistency"
+      "formatting"
     ]
   },
   {
@@ -791,7 +791,7 @@
     "id": "tool-59",
     "name": "Reek",
     "language": "Ruby",
-    "category": "Code smell detection",
+    "category": "Static analysis",
     "relatedMetricIds": [],
     "metrics": [
       "long methods",
@@ -859,7 +859,7 @@
     "category": "Static analysis",
     "relatedMetricIds": [],
     "metrics": [
-      "bugs",
+      "bug detection",
       "concurrency",
       "undefined behavior"
     ]
@@ -873,7 +873,7 @@
       "17"
     ],
     "metrics": [
-      "vulnerabilities",
+      "security issues",
       "dataflow issues"
     ]
   },
@@ -895,7 +895,7 @@
     "id": "tool-67",
     "name": "ArchUnit",
     "language": "Java",
-    "category": "Architecture",
+    "category": "Architecture & comprehension",
     "relatedMetricIds": [],
     "metrics": [
       "layering rules",
@@ -912,7 +912,7 @@
     ],
     "metrics": [
       "code smells",
-      "bugs",
+      "bug detection",
       "style"
     ]
   },
@@ -969,7 +969,7 @@
     "category": "Static analysis",
     "relatedMetricIds": [],
     "metrics": [
-      "bug patterns",
+      "bug detection",
       "nullability",
       "misuse"
     ]
@@ -994,7 +994,7 @@
       "17"
     ],
     "metrics": [
-      "vulnerabilities",
+      "security issues",
       "dataflow"
     ]
   },
@@ -1028,8 +1028,8 @@
       "9"
     ],
     "metrics": [
-      "bugs",
-      "smells"
+      "bug detection",
+      "code smells"
     ]
   },
   {
@@ -1064,7 +1064,7 @@
       "17"
     ],
     "metrics": [
-      "vulnerabilities"
+      "security issues"
     ]
   },
   {
@@ -1087,7 +1087,7 @@
       "8"
     ],
     "metrics": [
-      "test coverage",
+      "code coverage",
       "coverage trends",
       "reporting and visualization"
     ]
@@ -1096,7 +1096,7 @@
     "id": "tool-84",
     "name": "Codacy",
     "language": "Multi-language",
-    "category": "Code quality platform",
+    "category": "Code quality",
     "relatedMetricIds": [
       "6",
       "8",
@@ -1108,14 +1108,14 @@
       "code duplication",
       "complexity",
       "security issues",
-      "coverage reporting"
+      "code coverage"
     ]
   },
   {
     "id": "tool-85",
     "name": "OpenGrok",
     "language": "Multi-language",
-    "category": "Code comprehension",
+    "category": "Architecture & comprehension",
     "relatedMetricIds": [],
     "metrics": [
       "code navigation",
