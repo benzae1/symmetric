@@ -159,7 +159,9 @@
     "metrics": [
       "severity-rated security issues (low/med/high)",
       "confidence rating",
-      "vulnerability categories (e.g. SQLi, hardcoded passwords)"
+      "vulnerability categories (e.g. SQLi, hardcoded passwords)",
+      "insecure coding patterns",
+      "potential security risks"
     ]
   },
   {
@@ -194,11 +196,15 @@
     "category": "Type checking",
     "relatedMetricIds": [],
     "metrics": [
+      "type safety",
       "type errors",
       "missing annotations",
       "incompatible return types",
       "optional misuse",
-      "unresolved imports"
+      "unresolved imports",
+      "incorrect variable usage",
+      "incorrect function usage",
+      "type consistency"
     ]
   },
   {
@@ -1070,6 +1076,52 @@
     "metrics": [
       "annotations",
       "memory safety"
+    ]
+  },
+  {
+    "id": "tool-83",
+    "name": "Codecov",
+    "language": "Multi-language",
+    "category": "Testing",
+    "relatedMetricIds": [
+      "8"
+    ],
+    "metrics": [
+      "test coverage",
+      "coverage trends",
+      "reporting and visualization"
+    ]
+  },
+  {
+    "id": "tool-84",
+    "name": "Codacy",
+    "language": "Multi-language",
+    "category": "Code quality platform",
+    "relatedMetricIds": [
+      "6",
+      "8",
+      "10",
+      "17"
+    ],
+    "metrics": [
+      "static analysis",
+      "code duplication",
+      "complexity",
+      "security issues",
+      "coverage reporting"
+    ]
+  },
+  {
+    "id": "tool-85",
+    "name": "OpenGrok",
+    "language": "Multi-language",
+    "category": "Code comprehension",
+    "relatedMetricIds": [],
+    "metrics": [
+      "code navigation",
+      "cross-references",
+      "project understanding",
+      "source code exploration"
     ]
   }
 ]
