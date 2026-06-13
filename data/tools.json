@@ -16,7 +16,8 @@
     ],
     "languages": [
       "Python"
-    ]
+    ],
+    "officialLink": "https://pypi.org/project/pylint/"
   },
   {
     "id": "tool-2",
