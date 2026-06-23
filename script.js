@@ -777,6 +777,14 @@ function createToolCard(tool) {
     item.textContent = metric;
     list.append(item);
   }
+  // Add official link if available
+  const linkEl = card.querySelector(".tool-card__link");
+  if (tool.officialLink) {
+    linkEl.textContent = "Official page";
+    linkEl.href = tool.officialLink;
+  } else {
+    linkEl.remove();
+}
 
   return card;
 }
