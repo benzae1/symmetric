@@ -1,3 +1,6 @@
+const REVIEW_API_BASE_URL = getReviewApiBaseUrl();
+const REVIEW_MESSAGE_LIMIT = 280;
+
 const state = {
   activeTab: "metrics",
   metrics: [],
@@ -18,7 +21,14 @@ const state = {
     metric: "all",
     relatedMetricId: "all"
   },
-  expandedMetricIds: new Set()
+  expandedMetricIds: new Set(),
+  expandedToolReviewIds: new Set(),
+  reviewSummariesByTool: {},
+  reviewDetailsByTool: {},
+  reviewLoadingByTool: {},
+  reviewSubmissionByTool: {},
+  reviewErrorByTool: {},
+  reviewSummaryStatus: "idle"
 };
 
 const difficultyOrder = {
@@ -70,7 +80,7 @@ const elements = {
 async function init() {
   bindEvents();
 
-  await Promise.all([loadMetrics(), loadTools()]);
+  await Promise.all([loadMetrics(), loadTools(), loadReviewSummaries()]);
 
   setActiveTab(state.activeTab);
   render();
@@ -135,6 +145,20 @@ async function loadTools() {
       <h2>Tool data could not be loaded.</h2>
       <p>${escapeHtml(error.message)}</p>
     `;
+  }
+}
+
+async function loadReviewSummaries() {
+  state.reviewSummaryStatus = "loading";
+
+  try {
+    const data = await fetchJson(buildApiUrl("/reviews/summary"));
+    state.reviewSummariesByTool = data.items || {};
+    state.reviewSummaryStatus = "ready";
+  } catch (error) {
+    state.reviewSummariesByTool = {};
+    state.reviewSummaryStatus = "error";
+    state.reviewErrorByTool.summary = error.message;
   }
 }
 
@@ -367,11 +391,11 @@ function normalizeLanguages(tool) {
     .map((language) => language.trim())
     .map((language) => {
       const aliases = {
-        "Dockerfiles": "Dockerfile",
+        Dockerfiles: "Dockerfile",
         "Obj-C": "Objective-C",
         "Ruby (Rails)": "Ruby",
-        "JS": "JavaScript",
-        "TS": "TypeScript"
+        JS: "JavaScript",
+        TS: "TypeScript"
       };
       return aliases[language] || language;
     })
@@ -530,6 +554,9 @@ function buildToolSummary() {
   }
   if (state.toolFilters.search) {
     parts.push(`Search "<span>${escapeHtml(state.toolFilters.search)}</span>"`);
+  }
+  if (state.reviewSummaryStatus === "error") {
+    parts.push("<span>Review service offline</span>");
   }
 
   return parts.join(" | ");
@@ -786,7 +813,220 @@ function createToolCard(tool) {
     linkEl.remove();
 }
 
+  hydrateToolReviewSection(card, tool);
+
   return card;
+}
+
+function hydrateToolReviewSection(card, tool) {
+  const summary = state.reviewSummariesByTool[tool.id] || {
+    toolId: tool.id,
+    reviewCount: 0,
+    averageRating: null
+  };
+  const details = state.reviewDetailsByTool[tool.id];
+  const isExpanded = state.expandedToolReviewIds.has(tool.id);
+  const isLoading = Boolean(state.reviewLoadingByTool[tool.id]);
+  const isSubmitting = Boolean(state.reviewSubmissionByTool[tool.id]);
+  const reviewError = state.reviewErrorByTool[tool.id];
+
+  card.querySelector(".tool-card__review-stars").textContent = buildStarString(summary.averageRating);
+  card.querySelector(".tool-card__review-average").textContent = summary.averageRating == null
+    ? "No ratings yet"
+    : `${Number(summary.averageRating).toFixed(1)} / 5`;
+  card.querySelector(".tool-card__review-count").textContent = summary.reviewCount > 0
+    ? `${summary.reviewCount} review${summary.reviewCount === 1 ? "" : "s"} logged`
+    : "Be the first to leave field notes for this tool.";
+
+  const toggle = card.querySelector(".tool-card__review-toggle");
+  const panel = card.querySelector(".tool-card__review-panel");
+  toggle.textContent = isExpanded ? "Hide reviews" : "Read reviews";
+  toggle.setAttribute("aria-expanded", String(isExpanded));
+  toggle.addEventListener("click", async () => {
+    await toggleToolReviews(tool.id);
+  });
+  panel.hidden = !isExpanded;
+
+  const status = card.querySelector(".tool-card__review-status");
+  const list = card.querySelector(".tool-card__review-list");
+  list.innerHTML = "";
+
+  if (state.reviewSummaryStatus === "error" && !details) {
+    status.textContent = "Review service is currently unreachable. Update config.js after you deploy the backend.";
+  } else if (isLoading) {
+    status.textContent = "Loading recent reviews...";
+  } else if (reviewError) {
+    status.textContent = reviewError;
+  } else if (details && details.reviews.length > 0) {
+    status.textContent = "";
+    for (const review of details.reviews) {
+      list.append(createReviewItem(review));
+    }
+  } else {
+    status.textContent = "No reviews yet. Your note can set the first benchmark.";
+  }
+
+  const form = card.querySelector(".review-form");
+  const ratingInput = form.querySelector(".review-form__rating-input");
+  const messageInput = form.querySelector(".review-form__message-input");
+  const feedback = form.querySelector(".review-form__feedback");
+  const submitButton = form.querySelector(".review-form__submit");
+  const stars = form.querySelector(".review-form__stars");
+
+  feedback.textContent = isSubmitting ? "Sending review..." : "";
+  submitButton.disabled = isSubmitting;
+  messageInput.maxLength = REVIEW_MESSAGE_LIMIT;
+
+  renderReviewSelector(stars, ratingInput, isSubmitting);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const selectedRating = Number(ratingInput.value);
+    const message = messageInput.value.trim();
+
+    if (!selectedRating) {
+      feedback.textContent = "Choose a star rating before you submit.";
+      return;
+    }
+
+    feedback.textContent = "";
+    await submitReview(tool.id, selectedRating, message);
+
+    const latestError = state.reviewErrorByTool[tool.id];
+    if (latestError) {
+      feedback.textContent = latestError;
+      return;
+    }
+
+    form.reset();
+    ratingInput.value = "";
+    renderTools();
+  });
+}
+
+function createReviewItem(review) {
+  const article = document.createElement("article");
+  article.className = "tool-review";
+
+  const header = document.createElement("div");
+  header.className = "tool-review__head";
+
+  const stars = document.createElement("p");
+  stars.className = "tool-review__stars";
+  stars.textContent = buildStarString(review.rating);
+
+  const date = document.createElement("p");
+  date.className = "tool-review__date";
+  date.textContent = formatReviewDate(review.createdAt);
+
+  header.append(stars, date);
+  article.append(header);
+
+  if (review.message) {
+    const message = document.createElement("p");
+    message.className = "tool-review__message";
+    message.textContent = review.message;
+    article.append(message);
+  } else {
+    const message = document.createElement("p");
+    message.className = "tool-review__message tool-review__message--muted";
+    message.textContent = "Rated without a written note.";
+    article.append(message);
+  }
+
+  return article;
+}
+
+function renderReviewSelector(container, ratingInput, disabled) {
+  container.innerHTML = "";
+  const currentRating = Number(ratingInput.value || 0);
+
+  for (let rating = 1; rating <= 5; rating += 1) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "review-star";
+    button.textContent = rating <= currentRating ? "★" : "☆";
+    button.setAttribute("aria-label", `${rating} star${rating === 1 ? "" : "s"}`);
+    button.setAttribute("aria-pressed", String(rating === currentRating));
+    button.disabled = disabled;
+    button.addEventListener("click", () => {
+      ratingInput.value = String(rating);
+      renderReviewSelector(container, ratingInput, disabled);
+    });
+    container.append(button);
+  }
+}
+
+async function toggleToolReviews(toolId) {
+  if (state.expandedToolReviewIds.has(toolId)) {
+    state.expandedToolReviewIds.delete(toolId);
+    renderTools();
+    return;
+  }
+
+  state.expandedToolReviewIds.add(toolId);
+  renderTools();
+
+  if (!state.reviewDetailsByTool[toolId]) {
+    await loadReviewsForTool(toolId);
+  }
+}
+
+async function loadReviewsForTool(toolId) {
+  state.reviewLoadingByTool[toolId] = true;
+  state.reviewErrorByTool[toolId] = "";
+  renderTools();
+
+  try {
+    const details = await fetchJson(buildApiUrl(`/reviews/${encodeURIComponent(toolId)}`));
+    state.reviewDetailsByTool[toolId] = details;
+    state.reviewSummariesByTool[toolId] = {
+      toolId,
+      reviewCount: details.reviewCount,
+      averageRating: details.averageRating
+    };
+  } catch (error) {
+    state.reviewErrorByTool[toolId] = error.message;
+  } finally {
+    state.reviewLoadingByTool[toolId] = false;
+    renderTools();
+  }
+}
+
+async function submitReview(toolId, rating, message) {
+  state.reviewSubmissionByTool[toolId] = true;
+  state.reviewErrorByTool[toolId] = "";
+  renderTools();
+
+  try {
+    const payload = {
+      toolId,
+      rating,
+      message
+    };
+    const response = await fetchJson(buildApiUrl("/reviews"), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const existingDetails = state.reviewDetailsByTool[toolId]?.reviews || [];
+    const nextReviews = [response.review, ...existingDetails].slice(0, 8);
+
+    state.reviewSummariesByTool[toolId] = response.summary;
+    state.reviewDetailsByTool[toolId] = {
+      toolId,
+      reviewCount: response.summary.reviewCount,
+      averageRating: response.summary.averageRating,
+      reviews: nextReviews
+    };
+  } catch (error) {
+    state.reviewErrorByTool[toolId] = error.message;
+  } finally {
+    state.reviewSubmissionByTool[toolId] = false;
+  }
 }
 
 function formatLanguages(tool) {
@@ -795,6 +1035,62 @@ function formatLanguages(tool) {
 
 function formatType(type) {
   return type === "meta_metric" ? "Meta-metric" : "Software metric";
+}
+
+function formatReviewDate(value) {
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }).format(new Date(value));
+  } catch (_error) {
+    return value;
+  }
+}
+
+function buildStarString(rating) {
+  if (rating == null || Number.isNaN(Number(rating))) {
+    return "☆☆☆☆☆";
+  }
+
+  const rounded = Math.max(0, Math.min(5, Math.round(Number(rating))));
+  return `${"★".repeat(rounded)}${"☆".repeat(5 - rounded)}`;
+}
+
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    let message = `Request failed: ${response.status}`;
+
+    try {
+      const payload = await response.json();
+      if (payload?.error) {
+        message = payload.error;
+      }
+    } catch (_error) {
+      // Ignore parse failures and fall back to the HTTP status.
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json();
+}
+
+function getReviewApiBaseUrl() {
+  const configured = window.SYMMETRIC_CONFIG?.reviewApiBaseUrl;
+
+  if (configured && typeof configured === "string") {
+    return configured.replace(/\/+$/, "");
+  }
+
+  return "http://localhost:8000/api";
+}
+
+function buildApiUrl(path) {
+  return `${REVIEW_API_BASE_URL}${path}`;
 }
 
 function escapeHtml(value) {

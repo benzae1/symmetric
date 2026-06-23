@@ -263,9 +263,54 @@
         <p class="tool-card__label">Measured metrics</p>
         <ul class="tool-card__list"></ul>
       </div>
+      <section class="tool-card__reviews" aria-label="Tool reviews">
+        <div class="tool-card__review-summary">
+          <p class="tool-card__review-kicker">Field notes</p>
+          <div class="tool-card__review-score">
+            <p class="tool-card__review-stars" aria-hidden="true"></p>
+            <p class="tool-card__review-average"></p>
+            <p class="tool-card__review-count"></p>
+          </div>
+          <button class="tool-card__review-toggle" type="button" aria-expanded="false"></button>
+        </div>
+
+        <div class="tool-card__review-panel" hidden>
+          <div class="tool-card__review-feed">
+            <p class="tool-card__review-feed-title">Recent reviews</p>
+            <p class="tool-card__review-status" role="status" aria-live="polite"></p>
+            <div class="tool-card__review-list"></div>
+          </div>
+
+          <form class="review-form">
+            <p class="review-form__title">Leave a review</p>
+            <div class="review-form__rating">
+              <span class="review-form__label">Star rating</span>
+              <div class="review-form__stars" role="radiogroup" aria-label="Star rating"></div>
+              <input class="review-form__rating-input" type="hidden" name="rating" value="">
+            </div>
+
+            <label class="field review-form__field">
+              <span>Optional note</span>
+              <textarea
+                class="review-form__message-input"
+                name="message"
+                rows="3"
+                maxlength="280"
+                placeholder="What worked well, what felt rough, or where this tool shines."
+              ></textarea>
+            </label>
+
+            <div class="review-form__footer">
+              <button class="review-form__submit" type="submit">Submit review</button>
+              <p class="review-form__feedback" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+      </section>
     </article>
   </template>
 
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
