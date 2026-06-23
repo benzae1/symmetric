@@ -1,0 +1,15 @@
+[Unit]
+Description=Symmetric Reviews API
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/symmetric/backend
+Environment=ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+ExecStart=/home/pi/symmetric/backend/.venv/bin/python /home/pi/symmetric/backend/app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
