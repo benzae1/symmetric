@@ -7,6 +7,17 @@ This project is a static frontend for browsing software metrics and tools, now e
 - reviews are stored in `SQLite`
 - tool reviews are keyed by the existing tool IDs in [data/tools.json](/c:/Users/anton/Documents/Projects/symmetric/data/tools.json)
 
+## Documentation
+
+Project docs now live in [docs/README.md](/c:/Users/anton/Documents/Projects/symmetric/docs/README.md).
+
+Key guides:
+
+- [Architecture](/c:/Users/anton/Documents/Projects/symmetric/docs/architecture.md)
+- [Developer Guide](/c:/Users/anton/Documents/Projects/symmetric/docs/developer-guide.md)
+- [Helpful Commands](/c:/Users/anton/Documents/Projects/symmetric/docs/helpful-commands.md)
+- [Deployment Notes](/c:/Users/anton/Documents/Projects/symmetric/docs/deployment.md)
+
 ## Project layout
 
 - [index.html](/c:/Users/anton/Documents/Projects/symmetric/index.html) renders the static site
