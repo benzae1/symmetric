@@ -113,6 +113,7 @@ def get_tool_summary(tool_id: str, connection: sqlite3.Connection) -> dict[str, 
 
 def add_cors_headers(response):
     request_origin = request.headers.get("Origin", "")
+    requested_private_network = request.headers.get("Access-Control-Request-Private-Network", "")
     allow_any = "*" in ALLOWED_ORIGINS
 
     if allow_any:
@@ -122,6 +123,8 @@ def add_cors_headers(response):
 
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    if requested_private_network.lower() == "true":
+        response.headers["Access-Control-Allow-Private-Network"] = "true"
     response.headers["Vary"] = "Origin"
     return response
 
